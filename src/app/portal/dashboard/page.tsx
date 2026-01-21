@@ -139,10 +139,10 @@ const recentDocuments = [
   },
 ]
 
-const healthColors = {
-  on_track: 'bg-green-500/10 text-green-500 border-green-500/20',
-  at_risk: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-  delayed: 'bg-red-500/10 text-red-500 border-red-500/20',
+const healthColors: Record<string, string> = {
+  on_track: 'bg-green-500/10 text-green-400 border-green-500/30',
+  at_risk: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
+  delayed: 'bg-red-500/10 text-red-400 border-red-500/30',
 }
 
 export default function ClientDashboard() {
