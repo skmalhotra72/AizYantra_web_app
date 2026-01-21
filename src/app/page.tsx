@@ -1,13 +1,10 @@
 'use client'
 
-import { useRef } from 'react'
 import Link from 'next/link'
-import { motion, useScroll, useTransform } from 'framer-motion'
 import { 
   ArrowUpRight, 
   Bot,
   Zap,
-  Globe,
   Workflow,
   MessageSquare,
   Database,
@@ -18,32 +15,6 @@ import {
   Layers,
   GitBranch
 } from 'lucide-react'
-
-// Animation variants
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
-    transition: { 
-      duration: 0.6, 
-      ease: "easeOut" 
-    } 
-  }
-}
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.1 }
-  }
-}
-
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: [0.25, 0.4, 0.25, 1] } }
-}
 
 // Stats data
 const stats = [
@@ -60,28 +31,28 @@ const services = [
     title: 'Voice Agents',
     description: 'Human-like AI voice agents with real-time context awareness.',
     tag: 'VOICE-001',
-    color: 'var(--accent-primary)',
+    colorClass: 'bg-orange-500/10 border-orange-500/20 text-orange-500',
   },
   {
     icon: MessageSquare,
     title: 'AI Chatbots',
     description: 'WhatsApp, Telegram & web bots that understand context.',
     tag: 'CHAT-002',
-    color: 'var(--accent-secondary)',
+    colorClass: 'bg-blue-500/10 border-blue-500/20 text-blue-500',
   },
   {
     icon: Workflow,
     title: 'Workflow Automation',
     description: 'End-to-end n8n automation with 400+ integrations.',
     tag: 'AUTO-003',
-    color: 'var(--accent-cyan)',
+    colorClass: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-500',
   },
   {
     icon: Database,
     title: 'AI Integration',
     description: 'Connect AI to your databases for live context.',
     tag: 'DATA-004',
-    color: 'var(--accent-purple)',
+    colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-500',
   },
 ]
 
@@ -98,119 +69,86 @@ const integrations = [
 ]
 
 export default function Home() {
-  const heroRef = useRef(null)
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"]
-  })
-  
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
-  const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.98])
-
   return (
     <div className="flex flex-col">
       {/* ============================================
-          HERO SECTION - STRIPE INSPIRED
+          HERO SECTION
           ============================================ */}
-      <section 
-        ref={heroRef}
-        className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-20"
-      >
-        {/* Hero Content */}
-        <motion.div 
-          style={{ opacity: heroOpacity, scale: heroScale }}
-          className="relative container mx-auto px-4 py-16 lg:py-24"
-        >
-          <motion.div 
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-            className="max-w-5xl mx-auto"
-          >
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-20">
+        <div className="relative container mx-auto px-4 py-16 lg:py-24">
+          <div className="max-w-5xl mx-auto">
             {/* Eyebrow */}
-            <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-6">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[hsl(var(--accent-primary)/.1)] border border-[hsl(var(--accent-primary)/.2)]">
-                <span className="w-2 h-2 rounded-full bg-[hsl(var(--accent-primary))] animate-pulse"></span>
-                <span className="text-xs font-mono font-medium text-[hsl(var(--accent-primary))] uppercase tracking-wider">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[hsl(var(--primary))]/10 border border-[hsl(var(--primary))]/20">
+                <span className="w-2 h-2 rounded-full bg-[hsl(var(--primary))] animate-pulse"></span>
+                <span className="text-xs font-mono font-medium text-[hsl(var(--primary))] uppercase tracking-wider">
                   Now Accepting Clients
                 </span>
               </span>
-            </motion.div>
+            </div>
 
             {/* Main Headline */}
-            <motion.h1 
-              variants={fadeInUp}
-              className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight mb-6 text-[hsl(var(--foreground))]"
-            >
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight mb-6 text-[hsl(var(--foreground))]">
               AI & Automation
               <br />
-              <span className="gradient-text-static">Engineered</span> for Impact
-            </motion.h1>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--accent))]">
+                Engineered
+              </span> for Impact
+            </h1>
 
             {/* Subheadline */}
-            <motion.p 
-              variants={fadeInUp}
-              className="text-lg md:text-xl text-[hsl(var(--foreground-muted))] mb-10 max-w-2xl leading-relaxed"
-            >
+            <p className="text-lg md:text-xl text-[hsl(var(--foreground-muted))] mb-10 max-w-2xl leading-relaxed">
               We partner with ambitious companies to design, build, and deploy 
               AI systems that deliver measurable business results.
-            </motion.p>
+            </p>
 
-            {/* CTA Buttons - Tactile Style */}
-            <motion.div 
-              variants={fadeInUp}
-              className="flex flex-col sm:flex-row gap-4 mb-16"
-            >
-              <Link href="/contact" className="btn-tactile btn-tactile-primary">
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-16">
+              <Link 
+                href="/contact" 
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[hsl(var(--primary))] hover:bg-[hsl(var(--primary))]/90 text-white font-semibold rounded-xl transition-all"
+              >
                 Start a Project
                 <ArrowUpRight className="w-4 h-4" />
               </Link>
-              <Link href="/services" className="btn-tactile btn-tactile-outline">
+              <Link 
+                href="/services" 
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[hsl(var(--surface-raised))] hover:bg-[hsl(var(--surface))] border border-[hsl(var(--border))] text-[hsl(var(--foreground))] font-semibold rounded-xl transition-all"
+              >
                 <Play className="w-4 h-4" />
                 View Our Work
               </Link>
-            </motion.div>
+            </div>
 
-            {/* Stats Bar - Technical Style */}
-            <motion.div 
-              variants={fadeInUp}
-              className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6"
-            >
-              {stats.map((stat, index) => (
+            {/* Stats Bar */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+              {stats.map((stat) => (
                 <div 
                   key={stat.label}
-                  className="card-bordered p-4 lg:p-6 group hover:border-[hsl(var(--accent-primary)/.3)] transition-colors"
+                  className="bg-[hsl(var(--surface-raised))] border border-[hsl(var(--border))] rounded-xl p-4 lg:p-6 hover:border-[hsl(var(--primary))]/30 transition-colors"
                 >
                   <div className="flex items-baseline gap-0.5 mb-1">
                     <span className="text-3xl lg:text-4xl font-semibold text-[hsl(var(--foreground))] font-mono tracking-tight">
                       {stat.value}
                     </span>
-                    <span className="text-lg lg:text-xl font-medium text-[hsl(var(--accent-primary))] font-mono">
+                    <span className="text-lg lg:text-xl font-medium text-[hsl(var(--primary))] font-mono">
                       {stat.unit}
                     </span>
                   </div>
-                  <div className="data-label">{stat.label}</div>
+                  <div className="text-xs font-mono text-[hsl(var(--foreground-muted))] uppercase tracking-wider">{stat.label}</div>
                   <div className="text-xs text-[hsl(var(--foreground-subtle))] mt-1">{stat.sublabel}</div>
                 </div>
               ))}
-            </motion.div>
-          </motion.div>
-        </motion.div>
+            </div>
+          </div>
+        </div>
 
         {/* Scroll Indicator */}
-        <motion.div 
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <div className="w-6 h-10 rounded-full border-2 border-[hsl(var(--border-strong))] flex items-start justify-center p-2">
-            <motion.div 
-              className="w-1 h-2 rounded-full bg-[hsl(var(--foreground-muted))]"
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            />
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+          <div className="w-6 h-10 rounded-full border-2 border-[hsl(var(--border))] flex items-start justify-center p-2">
+            <div className="w-1 h-2 rounded-full bg-[hsl(var(--foreground-muted))] animate-bounce" />
           </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* ============================================
@@ -219,16 +157,10 @@ export default function Home() {
       <section className="relative py-24 overflow-hidden">
         <div className="container mx-auto px-4">
           {/* Section Header */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="mb-16"
-          >
+          <div className="mb-16">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-[2px] bg-[hsl(var(--accent-primary))]"></div>
-              <span className="text-xs font-mono font-medium text-[hsl(var(--accent-primary))] uppercase tracking-wider">
+              <div className="w-8 h-[2px] bg-[hsl(var(--primary))]"></div>
+              <span className="text-xs font-mono font-medium text-[hsl(var(--primary))] uppercase tracking-wider">
                 Capabilities
               </span>
             </div>
@@ -239,24 +171,15 @@ export default function Home() {
               From voice agents to workflow automation, we build production-ready 
               AI systems that integrate with your existing infrastructure.
             </p>
-          </motion.div>
+          </div>
 
           {/* Bento Grid */}
-          <motion.div 
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            className="grid grid-cols-12 gap-4 lg:gap-6"
-          >
+          <div className="grid grid-cols-12 gap-4 lg:gap-6">
             {/* Main Feature Card */}
-            <motion.div 
-              variants={scaleIn}
-              className="col-span-12 lg:col-span-8 glass-card rounded-2xl p-8 lg:p-10 hover-lift group"
-            >
+            <div className="col-span-12 lg:col-span-8 bg-[hsl(var(--surface-raised))] border border-[hsl(var(--border))] rounded-2xl p-8 lg:p-10 hover:border-[hsl(var(--primary))]/30 transition-all">
               <div className="flex items-start justify-between mb-6">
-                <div className="p-3 rounded-xl bg-[hsl(var(--accent-primary)/.1)] border border-[hsl(var(--accent-primary)/.2)]">
-                  <Cpu className="w-6 h-6 text-[hsl(var(--accent-primary))]" />
+                <div className="p-3 rounded-xl bg-[hsl(var(--primary))]/10 border border-[hsl(var(--primary))]/20">
+                  <Cpu className="w-6 h-6 text-[hsl(var(--primary))]" />
                 </div>
                 <span className="text-xs font-mono text-[hsl(var(--foreground-subtle))] uppercase tracking-wider">
                   CORE-001
@@ -266,31 +189,28 @@ export default function Home() {
                 End-to-End AI Systems
               </h3>
               <p className="text-[hsl(var(--foreground-muted))] mb-8 max-w-xl leading-relaxed">
-                We don't just consult—we engineer complete AI solutions from strategy 
+                We don&apos;t just consult—we engineer complete AI solutions from strategy 
                 to deployment, with ongoing optimization and support.
               </p>
               
               {/* Thinking Animation Demo */}
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-[hsl(var(--bg-secondary))] border border-[hsl(var(--border))]">
-                <div className="thinking-dots">
-                  <div className="thinking-dot"></div>
-                  <div className="thinking-dot"></div>
-                  <div className="thinking-dot"></div>
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-[hsl(var(--background))] border border-[hsl(var(--border))]">
+                <div className="flex gap-1">
+                  <div className="w-2 h-2 rounded-full bg-[hsl(var(--primary))] animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 rounded-full bg-[hsl(var(--primary))] animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 rounded-full bg-[hsl(var(--primary))] animate-bounce" style={{ animationDelay: '300ms' }}></div>
                 </div>
                 <span className="text-sm font-mono text-[hsl(var(--foreground-muted))]">
                   AI Processing Request...
                 </span>
               </div>
-            </motion.div>
+            </div>
 
             {/* Side Stats Card */}
-            <motion.div 
-              variants={scaleIn}
-              className="col-span-12 lg:col-span-4 glass-card rounded-2xl p-6 lg:p-8 hover-lift"
-            >
+            <div className="col-span-12 lg:col-span-4 bg-[hsl(var(--surface-raised))] border border-[hsl(var(--border))] rounded-2xl p-6 lg:p-8 hover:border-[hsl(var(--primary))]/30 transition-all">
               <div className="flex items-start justify-between mb-6">
-                <div className="p-3 rounded-xl bg-[hsl(var(--accent-secondary)/.1)] border border-[hsl(var(--accent-secondary)/.2)]">
-                  <Radio className="w-6 h-6 text-[hsl(var(--accent-secondary))]" />
+                <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                  <Radio className="w-6 h-6 text-blue-500" />
                 </div>
                 <span className="text-xs font-mono text-[hsl(var(--foreground-subtle))] uppercase tracking-wider">
                   LIVE
@@ -310,47 +230,37 @@ export default function Home() {
                 </div>
                 <div className="flex justify-between items-center py-3">
                   <span className="text-sm text-[hsl(var(--foreground-muted))]">Uptime</span>
-                  <span className="font-mono font-semibold text-[hsl(var(--accent-cyan))]">99.9%</span>
+                  <span className="font-mono font-semibold text-cyan-500">99.9%</span>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Service Cards */}
-            {services.map((service, index) => (
-              <motion.div 
+            {services.map((service) => (
+              <div 
                 key={service.title}
-                variants={scaleIn}
-                className="col-span-12 sm:col-span-6 lg:col-span-3 card-interactive rounded-2xl p-6 group"
+                className="col-span-12 sm:col-span-6 lg:col-span-3 bg-[hsl(var(--surface-raised))] border border-[hsl(var(--border))] rounded-2xl p-6 hover:border-[hsl(var(--primary))]/30 transition-all group"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div 
-                    className="p-3 rounded-xl transition-colors"
-                    style={{ 
-                      backgroundColor: `hsl(${service.color} / 0.1)`,
-                      border: `1px solid hsl(${service.color} / 0.2)`
-                    }}
-                  >
-                    <service.icon 
-                      className="w-5 h-5 transition-colors" 
-                      style={{ color: `hsl(${service.color})` }}
-                    />
+                  <div className={`p-3 rounded-xl border ${service.colorClass}`}>
+                    <service.icon className="w-5 h-5" />
                   </div>
                   <span className="text-[10px] font-mono text-[hsl(var(--foreground-subtle))] uppercase tracking-wider">
                     {service.tag}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold text-[hsl(var(--foreground))] mb-2 group-hover:text-[hsl(var(--accent-primary))] transition-colors">
+                <h3 className="text-lg font-semibold text-[hsl(var(--foreground))] mb-2 group-hover:text-[hsl(var(--primary))] transition-colors">
                   {service.title}
                 </h3>
                 <p className="text-sm text-[hsl(var(--foreground-muted))] leading-relaxed">
                   {service.description}
                 </p>
-                <div className="mt-4 flex items-center gap-1 text-sm font-medium text-[hsl(var(--accent-primary))] opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="mt-4 flex items-center gap-1 text-sm font-medium text-[hsl(var(--primary))] opacity-0 group-hover:opacity-100 transition-opacity">
                   Learn more <ChevronRight className="w-4 h-4" />
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -359,19 +269,13 @@ export default function Home() {
           ============================================ */}
       <section className="relative py-24 overflow-hidden">
         <div className="container mx-auto px-4">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-16"
-          >
+          <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-8 h-[2px] bg-[hsl(var(--accent-secondary))]"></div>
-              <span className="text-xs font-mono font-medium text-[hsl(var(--accent-secondary))] uppercase tracking-wider">
+              <div className="w-8 h-[2px] bg-[hsl(var(--accent))]"></div>
+              <span className="text-xs font-mono font-medium text-[hsl(var(--accent))] uppercase tracking-wider">
                 Integrations
               </span>
-              <div className="w-8 h-[2px] bg-[hsl(var(--accent-secondary))]"></div>
+              <div className="w-8 h-[2px] bg-[hsl(var(--accent))]"></div>
             </div>
             <h2 className="text-3xl md:text-4xl font-semibold text-[hsl(var(--foreground))] mb-4">
               Connect Everything
@@ -379,41 +283,29 @@ export default function Home() {
             <p className="text-lg text-[hsl(var(--foreground-muted))] max-w-2xl mx-auto">
               Seamlessly integrate with 400+ tools and platforms your team already uses.
             </p>
-          </motion.div>
+          </div>
 
           {/* Integration Icons Grid */}
-          <motion.div 
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="flex flex-wrap justify-center gap-4 max-w-3xl mx-auto"
-          >
-            {integrations.map((integration, index) => (
-              <motion.div
+          <div className="flex flex-wrap justify-center gap-4 max-w-3xl mx-auto">
+            {integrations.map((integration) => (
+              <div
                 key={integration.name}
-                variants={fadeInUp}
-                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-[hsl(var(--bg-tertiary))] border border-[hsl(var(--border))] hover:border-[hsl(var(--accent-primary)/.3)] transition-all hover-lift"
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-[hsl(var(--surface-raised))] border border-[hsl(var(--border))] hover:border-[hsl(var(--primary))]/30 transition-all"
                 style={{ minWidth: '100px' }}
               >
                 <span className="text-3xl">{integration.icon}</span>
                 <span className="text-xs font-medium text-[hsl(var(--foreground-muted))]">
                   {integration.name}
                 </span>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
 
-          <motion.div 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mt-8"
-          >
+          <div className="text-center mt-8">
             <span className="text-sm text-[hsl(var(--foreground-subtle))]">
               + 400 more integrations via n8n & custom APIs
             </span>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -422,20 +314,14 @@ export default function Home() {
           ============================================ */}
       <section className="relative py-24 overflow-hidden">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="glass-card rounded-3xl p-10 lg:p-16 text-center max-w-4xl mx-auto relative overflow-hidden"
-          >
+          <div className="bg-[hsl(var(--surface-raised))] border border-[hsl(var(--border))] rounded-3xl p-10 lg:p-16 text-center max-w-4xl mx-auto relative overflow-hidden">
             {/* Background Accent */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[hsl(var(--accent-primary)/.1)] rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-[hsl(var(--accent-secondary)/.1)] rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[hsl(var(--primary))]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-[hsl(var(--accent))]/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
             
             <div className="relative">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[hsl(var(--bg-secondary))] border border-[hsl(var(--border))] mb-6">
-                <Layers className="w-4 h-4 text-[hsl(var(--accent-primary))]" />
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[hsl(var(--background))] border border-[hsl(var(--border))] mb-6">
+                <Layers className="w-4 h-4 text-[hsl(var(--primary))]" />
                 <span className="text-xs font-mono font-medium text-[hsl(var(--foreground-muted))] uppercase tracking-wider">
                   Free Consultation
                 </span>
@@ -450,17 +336,23 @@ export default function Home() {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/contact" className="btn-tactile btn-tactile-primary">
+                <Link 
+                  href="/contact" 
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[hsl(var(--primary))] hover:bg-[hsl(var(--primary))]/90 text-white font-semibold rounded-xl transition-all"
+                >
                   Schedule a Call
                   <ArrowUpRight className="w-4 h-4" />
                 </Link>
-                <Link href="/about" className="btn-tactile btn-tactile-outline">
+                <Link 
+                  href="/about" 
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[hsl(var(--background))] hover:bg-[hsl(var(--surface))] border border-[hsl(var(--border))] text-[hsl(var(--foreground))] font-semibold rounded-xl transition-all"
+                >
                   <GitBranch className="w-4 h-4" />
                   View Case Studies
                 </Link>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>
