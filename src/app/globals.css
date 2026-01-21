@@ -42,6 +42,18 @@
   --radius: 12px;
   --radius-lg: 16px;
   --radius-xl: 24px;
+
+  /* ============================================
+     COMPATIBILITY ALIASES
+     ============================================ */
+  --background: var(--bg-primary);
+  --surface: var(--bg-secondary);
+  --surface-raised: var(--bg-tertiary);
+  --primary: var(--accent-primary);
+  --primary-hover: 24 95% 48%;
+  --primary-dark: 24 95% 40%;
+  --accent: var(--accent-secondary);
+  --accent-hover: 217 91% 55%;
 }
 
 .dark {
@@ -63,6 +75,54 @@
   /* Glass Effects */
   --glass-bg: 220 15% 15% / 0.7;
   --glass-border: 255 255% 255% / 0.1;
+
+  /* Compatibility Aliases - Dark Mode */
+  --background: var(--bg-primary);
+  --surface: var(--bg-secondary);
+  --surface-raised: var(--bg-tertiary);
+  --primary: var(--accent-primary);
+  --primary-hover: 24 95% 58%;
+  --primary-dark: 24 95% 45%;
+  --accent: var(--accent-secondary);
+  --accent-hover: 217 91% 65%;
+}
+
+/* ============================================
+   FORCE DARK MODE BY DEFAULT
+   ============================================ */
+html {
+  color-scheme: dark;
+}
+
+html:not(.light) {
+  /* Technical Greys - Dark Mode */
+  --bg-primary: 220 15% 8%;
+  --bg-secondary: 220 15% 12%;
+  --bg-tertiary: 220 15% 15%;
+  
+  /* Foreground */
+  --foreground: 210 40% 98%;
+  --foreground-muted: 215 20% 65%;
+  --foreground-subtle: 215 15% 50%;
+  
+  /* Borders & Shadows */
+  --border: 220 15% 20%;
+  --border-strong: 220 15% 30%;
+  --shadow-color: 0 0% 0%;
+  
+  /* Glass Effects */
+  --glass-bg: 220 15% 15% / 0.7;
+  --glass-border: 255 255% 255% / 0.1;
+
+  /* Compatibility Aliases */
+  --background: var(--bg-primary);
+  --surface: var(--bg-secondary);
+  --surface-raised: var(--bg-tertiary);
+  --primary: var(--accent-primary);
+  --primary-hover: 24 95% 58%;
+  --primary-dark: 24 95% 45%;
+  --accent: var(--accent-secondary);
+  --accent-hover: 217 91% 65%;
 }
 
 /* ============================================
@@ -579,4 +639,31 @@ body {
   height: 2px;
   background: linear-gradient(90deg, hsl(var(--accent-primary)), hsl(var(--accent-secondary)));
   border-radius: 1px;
+}
+
+/* ============================================
+   CONTAINER UTILITY
+   ============================================ */
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
 }
