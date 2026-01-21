@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
-import { Header } from '@/components/layout/header'
-import { Footer } from '@/components/layout/footer'
+import { ConditionalLayout } from '@/components/layout/conditional-layout'
 import { ThemeProvider } from '@/providers/theme-provider'
+import { VoiceAgentWidget } from '@/components/voice-agent'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -49,20 +49,19 @@ export default function RootLayout({
           <div className="fixed inset-0 -z-10">
             {/* Base background */}
             <div className="absolute inset-0 bg-[hsl(240,5%,96%)] dark:bg-[hsl(220,15%,8%)] transition-colors duration-500"></div>
-            
             {/* Grid pattern - Stripe style */}
             <div className="absolute inset-0 bg-grid-stripe opacity-40 dark:opacity-20"></div>
-            
             {/* Gradient mesh */}
             <div className="absolute inset-0 bg-gradient-mesh opacity-60 dark:opacity-40"></div>
           </div>
-
+          
           {/* Page Content */}
-          <div className="relative flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
+          <ConditionalLayout>
+            {children}
+          </ConditionalLayout>
+          
+          {/* Voice Agent Widget - appears on all public pages */}
+          <VoiceAgentWidget />
         </ThemeProvider>
       </body>
     </html>
