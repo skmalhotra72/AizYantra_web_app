@@ -101,7 +101,7 @@ const statusOptions = [
   { value: 'overdue', label: 'Overdue' },
 ]
 
-const statusConfig = {
+const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
   paid: {
     label: 'Paid',
     color: 'bg-green-500/10 text-green-500 border-green-500/20',
