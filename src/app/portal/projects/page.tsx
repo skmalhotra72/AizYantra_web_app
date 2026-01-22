@@ -98,7 +98,7 @@ const healthColors: Record<string, string> = {
   delayed: 'bg-red-500/10 text-red-500 border-red-500/20',
 }
 
-const statusColors = {
+const statusColors: Record<string, string> = {
   design: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
   development: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
   testing: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
