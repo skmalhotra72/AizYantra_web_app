@@ -209,7 +209,7 @@ const projectsData: Record<string, any> = {
   },
 }
 
-const statusColors = {
+const statusColors: Record<string, string> = {
   completed: 'bg-green-500/10 text-green-500 border-green-500/20',
   in_progress: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
   pending: 'bg-gray-500/10 text-gray-500 border-gray-500/20',
