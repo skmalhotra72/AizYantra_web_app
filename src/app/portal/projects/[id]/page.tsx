@@ -215,7 +215,7 @@ const statusColors = {
   pending: 'bg-gray-500/10 text-gray-500 border-gray-500/20',
 }
 
-const healthColors = {
+const healthColors: Record<string, string> = {
   on_track: 'bg-green-500/10 text-green-500 border-green-500/20',
   at_risk: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
   delayed: 'bg-red-500/10 text-red-500 border-red-500/20',
