@@ -3,7 +3,7 @@ import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { ConditionalLayout } from '@/components/layout/conditional-layout'
 import { ThemeProvider } from '@/providers/theme-provider'
-import { VoiceAgentWidget } from '@/components/voice-agent'
+import { TriptiFloatingWidget } from '@/components/voice-agent'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -60,8 +60,8 @@ export default function RootLayout({
             {children}
           </ConditionalLayout>
           
-          {/* Voice Agent Widget - appears on all public pages */}
-          <VoiceAgentWidget />
+          {/* Tripti Floating Avatar Widget - Pre-loads 3D avatar on page load */}
+          <TriptiFloatingWidget position="bottom-right" />
         </ThemeProvider>
       </body>
     </html>
