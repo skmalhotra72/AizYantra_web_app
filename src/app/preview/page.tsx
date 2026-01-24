@@ -4,7 +4,12 @@ import { BlueprintsSection } from "@/components/sections/blueprints-section";
 import { ElementsSection } from "@/components/sections/elements-section";
 import { FinalCTASection } from "@/components/sections/final-cta-section";
 
-export default function Home() {
+export const metadata = {
+  title: "Preview | AIzYantra New Design",
+  description: "Preview of the new AIzYantra website design",
+};
+
+export default function PreviewPage() {
   return (
     <main className="min-h-screen">
       {/* Hero Section - Globe + Expandable Tags */}

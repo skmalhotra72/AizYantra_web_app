@@ -4,6 +4,8 @@ import './globals.css'
 import { ConditionalLayout } from '@/components/layout/conditional-layout'
 import { ThemeProvider } from '@/providers/theme-provider'
 import { TriptiFloatingWidget } from '@/components/voice-agent'
+import { SmoothScrolling } from '@/components/providers/smooth-scrolling'
+import { SacredGeometryWrapper } from '@/components/ui/sacred-geometry-wrapper'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -45,23 +47,29 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange={false}
         >
-          {/* Global Background */}
-          <div className="fixed inset-0 -z-10">
-            {/* Base background */}
-            <div className="absolute inset-0 bg-[hsl(240,5%,96%)] dark:bg-[hsl(220,15%,8%)] transition-colors duration-500"></div>
-            {/* Grid pattern - Stripe style */}
-            <div className="absolute inset-0 bg-grid-stripe opacity-40 dark:opacity-20"></div>
-            {/* Gradient mesh */}
-            <div className="absolute inset-0 bg-gradient-mesh opacity-60 dark:opacity-40"></div>
-          </div>
-          
-          {/* Page Content */}
-          <ConditionalLayout>
-            {children}
-          </ConditionalLayout>
-          
-          {/* Tripti Floating Avatar Widget - Pre-loads 3D avatar on page load */}
-          <TriptiFloatingWidget position="bottom-right" />
+          {/* Smooth Scrolling Provider - Lenis + GSAP */}
+          <SmoothScrolling>
+            {/* Global Background */}
+            <div className="fixed inset-0 -z-10">
+              {/* Base background */}
+              <div className="absolute inset-0 bg-[hsl(240,5%,96%)] dark:bg-[hsl(220,15%,8%)] transition-colors duration-500"></div>
+              {/* Grid pattern - Stripe style */}
+              <div className="absolute inset-0 bg-grid-stripe opacity-40 dark:opacity-20"></div>
+              {/* Gradient mesh */}
+              <div className="absolute inset-0 bg-gradient-mesh opacity-60 dark:opacity-40"></div>
+            </div>
+            
+            {/* Sacred Geometry Background - Assembles on scroll */}
+            <SacredGeometryWrapper />
+            
+            {/* Page Content */}
+            <ConditionalLayout>
+              {children}
+            </ConditionalLayout>
+            
+            {/* Tripti Floating Avatar Widget - Pre-loads 3D avatar on page load */}
+            <TriptiFloatingWidget position="bottom-right" />
+          </SmoothScrolling>
         </ThemeProvider>
       </body>
     </html>
