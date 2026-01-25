@@ -196,8 +196,8 @@ async function getProjectList(contactId: string, organizationId: string) {
       project_id,
       role,
       projects (
-        id, name, status, phase, completion_percentage,
-        start_date, estimated_end_date
+        id, name, status, current_phase, progress_percentage,
+        planned_start_date, planned_end_date, description
       )
     `)
     .eq('contact_id', contactId);
@@ -206,7 +206,7 @@ async function getProjectList(contactId: string, organizationId: string) {
   if (!data || data.length === 0) {
     const orgProjects = await supabase
       .from('projects')
-      .select('id, name, status, phase, completion_percentage, start_date, estimated_end_date')
+      .select('id, name, status, current_phase, progress_percentage, planned_start_date, planned_end_date, description')
       .eq('organization_id', organizationId)
       .neq('status', 'cancelled')
       .order('updated_at', { ascending: false })
@@ -231,7 +231,7 @@ async function getProjectList(contactId: string, organizationId: string) {
     return {
       data: projects,
       data_id: p.id,
-      message: `I found your project "${p.name}". It's currently ${p.status} in the ${p.phase || 'active'} phase at ${p.completion_percentage || 0}% completion.`,
+      message: `I found your project "${p.name}". It's currently ${p.status} in the ${p.current_phase || 'active'} phase at ${p.progress_percentage || 0}% completion.`,
       follow_up: "Would you like more details about this project?"
     };
   }
@@ -252,8 +252,8 @@ async function getProjectStatus(contactId: string, params: any) {
   let query = supabase
     .from('projects')
     .select(`
-      id, name, status, phase, completion_percentage,
-      start_date, estimated_end_date, description
+      id, name, status, current_phase, progress_percentage,
+      planned_start_date, planned_end_date, description
     `);
 
   if (project_id) {
@@ -284,7 +284,7 @@ async function getProjectStatus(contactId: string, params: any) {
   return {
     data: project,
     data_id: project.id,
-    message: `Your project "${project.name}" is currently ${project.status}. It's in the ${project.phase || 'active'} phase at ${project.completion_percentage || 0}% completion. ${project.estimated_end_date ? `Expected completion is ${formatDate(project.estimated_end_date)}.` : ''}`,
+    message: `Your project "${project.name}" is currently ${project.status}. It's in the ${project.current_phase || 'active'} phase at ${project.progress_percentage || 0}% completion. ${project.planned_end_date ? `Expected completion is ${formatDate(project.planned_end_date)}.` : ''}`,
     follow_up: "Would you like to know about the milestones or any specific details?"
   };
 }
@@ -305,9 +305,9 @@ async function getProjectDetails(contactId: string, params: any) {
   const { data, error } = await supabase
     .from('projects')
     .select(`
-      id, name, status, phase, completion_percentage,
-      start_date, estimated_end_date, description,
-      milestones (id, name, status, due_date)
+      id, name, status, current_phase, progress_percentage,
+      planned_start_date, planned_end_date, description,
+      contract_value, health_status, service_type
     `)
     .eq('id', project_id)
     .single();
@@ -322,18 +322,16 @@ async function getProjectDetails(contactId: string, params: any) {
   }
 
   const project = sanitizeData(data);
-  const completedMilestones = project.milestones?.filter((m: any) => m.status === 'completed').length || 0;
-  const totalMilestones = project.milestones?.length || 0;
 
   return {
     data: project,
     data_id: project.id,
-    message: `Here are the details for "${project.name}": ${project.description || 'No description available.'}. Status: ${project.status}, Phase: ${project.phase || 'active'}, Progress: ${project.completion_percentage || 0}%. Milestones: ${completedMilestones} of ${totalMilestones} completed.`,
-    follow_up: "Would you like information about specific milestones?"
+    message: `Here are the details for "${project.name}": ${project.description || 'No description available.'}. Status: ${project.status}, Phase: ${project.current_phase || 'active'}, Progress: ${project.progress_percentage || 0}%. Health: ${project.health_status || 'Good'}.`,
+    follow_up: "Would you like information about invoices or payments?"
   };
 }
 
-// Get milestones
+// Get milestones - check if table exists first
 async function getMilestones(contactId: string, params: any) {
   const { project_id } = params;
 
@@ -346,18 +344,42 @@ async function getMilestones(contactId: string, params: any) {
     };
   }
 
-  const { data, error } = await supabase
-    .from('milestones')
+  // Try project_milestones table first
+  let { data, error } = await supabase
+    .from('project_milestones')
     .select('id, name, description, status, due_date')
     .eq('project_id', project_id)
     .order('due_date', { ascending: true })
     .limit(10);
 
-  if (error || !data || data.length === 0) {
+  // If project_milestones doesn't exist, try milestones table
+  if (error) {
+    const fallback = await supabase
+      .from('milestones')
+      .select('id, name, description, status, due_date')
+      .eq('project_id', project_id)
+      .order('due_date', { ascending: true })
+      .limit(10);
+    
+    data = fallback.data;
+    error = fallback.error;
+  }
+
+  if (error) {
+    // Table might not exist or no data
     return {
       data: null,
       data_id: null,
-      message: "I couldn't find any milestones for this project.",
+      message: "Milestone tracking is being set up for this project.",
+      follow_up: "Would you like to know something else about the project?"
+    };
+  }
+
+  if (!data || data.length === 0) {
+    return {
+      data: null,
+      data_id: null,
+      message: "I couldn't find any milestones for this project yet.",
       follow_up: "Would you like to know something else about the project?"
     };
   }
