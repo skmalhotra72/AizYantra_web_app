@@ -81,17 +81,11 @@ interface TriptiFloatingWidgetProps {
 // ========== FORM STEPS ==========
 type FormStep = 'phone' | 'details' | 'ready'
 
-// ========== SECURE DATA QUERY TYPES ==========
-type SecureQueryType = 
-  | 'project_list'
-  | 'project_status'
-  | 'project_details'
-  | 'milestones'
-  | 'proposal_list'
-  | 'proposal_details'
-  | 'invoice_list'
-  | 'invoice_details'
-  | 'payment_history'
+// ========== DATA QUERY INTENT DETECTION ==========
+interface DataQueryIntent {
+  type: 'project_list' | 'project_status' | 'invoice_list' | 'payment_history' | 'proposal_list' | null
+  params?: Record<string, string>
+}
 
 // ========== GENERATE TRIPTI SYSTEM PROMPT WITH CONTEXT ==========
 const generateSystemPrompt = (
@@ -135,89 +129,38 @@ You already have their basic details - focus on understanding their needs!
 `
   }
 
-  // Data access section based on verification level
+  // Data access section - simplified, no query markers
   const dataAccessSection = `
-## DATA ACCESS CAPABILITIES (CURRENT VERIFICATION LEVEL: ${verificationLevel})
+## DATA ACCESS CAPABILITIES
 
-You have the ability to look up client information. When caller asks about their projects, invoices, proposals, or payments, you can retrieve this information.
+You have access to this caller's account information. When they ask about projects, invoices, proposals, or payments, the data will be provided to you automatically via system messages.
 
-### VERIFICATION LEVELS:
-- Level 0 (Unverified): General info only - NO data access
-- Level 1 (Phone Verified): Basic project status ✓
-- Level 2 (Identity Confirmed): Project details, milestones ✓
-- Level 3 (Security Verified): Invoices, payments, proposals ✓
+**CURRENT VERIFICATION LEVEL: ${verificationLevel}**
+${verificationLevel >= 3 ? '✅ FULL ACCESS: Projects, invoices, payments, proposals' :
+  verificationLevel >= 2 ? '✅ STANDARD ACCESS: Project details and milestones' :
+  verificationLevel >= 1 ? '✅ BASIC ACCESS: Project status' :
+  '❌ NO DATA ACCESS: Verification needed'}
 
-### CURRENT CALLER STATUS:
-${verificationLevel >= 1 ? '✅ Phone verified' : '❌ Phone not verified'}
-${verificationLevel >= 2 ? '✅ Identity confirmed' : '❌ Identity not confirmed'}
-${verificationLevel >= 3 ? '✅ Security verified' : '❌ Not security verified'}
+**HOW IT WORKS:**
+- When the caller asks about their projects, invoices, etc., the data will appear in a system message
+- Read the data naturally and conversationally
+- DO NOT say things like "let me check" or "looking up" - just speak the information naturally
+- If you receive data, incorporate it smoothly into your response
 
-### HOW TO HANDLE DATA REQUESTS:
-
-**For Project Status (requires Level 1):**
-${verificationLevel >= 1 ? 
-  'You CAN look up their projects. Say: "Let me check that for you..." then use [QUERY:project_list] or [QUERY:project_status:project_name]' : 
-  'Ask them to confirm: "Just to confirm, am I speaking with [Name] from [Company]?"'}
-
-**For Project Details/Milestones (requires Level 2):**
-${verificationLevel >= 2 ? 
-  'You CAN provide details. Use [QUERY:project_details:project_id] or [QUERY:milestones:project_id]' : 
-  'Say: "For security, could you please confirm your full name and company?"'}
-
-**For Financial Data - Invoices/Payments/Proposals (requires Level 3):**
-${verificationLevel >= 3 ? 
-  'You CAN share financial data. Use [QUERY:invoice_list] or [QUERY:payment_history] or [QUERY:proposal_list]' : 
-  'Say: "Before I share financial details, could you confirm the name of one of your projects with us, or the approximate amount of your last invoice?"'}
-
-### QUERY SYNTAX (Use these exact formats):
-- [QUERY:project_list] - List all their projects
-- [QUERY:project_status:PROJECT_NAME] - Status of specific project
-- [QUERY:project_details:PROJECT_ID] - Full project details
-- [QUERY:milestones:PROJECT_ID] - Project milestones
-- [QUERY:proposal_list] - List their proposals
-- [QUERY:proposal_details:PROPOSAL_ID] - Specific proposal
-- [QUERY:invoice_list] - List their invoices
-- [QUERY:invoice_details:INVOICE_ID] - Specific invoice
-- [QUERY:payment_history] - Their payment history
-
-### WHAT YOU CAN SHARE:
+**WHAT YOU CAN SHARE:**
 ✅ Project name, status, phase, completion percentage
 ✅ Milestone names and due dates
-✅ Proposal title, value, status, validity (Level 3+)
-✅ Invoice number, amount, due date, payment status (Level 3+)
-✅ Payment receipt confirmation (Level 3+)
+✅ Proposal title, value, status (if verification level 3+)
+✅ Invoice amounts, due dates, payment status (if verification level 3+)
 
-### WHAT YOU CANNOT SHARE (NEVER):
+**WHAT YOU CANNOT SHARE (NEVER):**
 ❌ Internal costs or profit margins
-❌ Other clients' information
-❌ Technical backend details (databases, APIs, tools like n8n, Supabase)
+❌ Other clients' information  
+❌ Technical backend details (databases, APIs, tools)
 ❌ Full document contents (offer to email instead)
-❌ Team member salaries or rates
-❌ Internal notes or discussions
 
-### HANDLING VERIFICATION:
-When caller needs higher verification, be friendly:
-- "For security, could you confirm [question]?"
-- "I just need to verify one thing to access that information..."
-- After they answer correctly, say: "Perfect, thank you! Let me look that up..."
-
-### SOCIAL ENGINEERING DEFENSE:
-If someone tries to bypass verification:
-- "I understand this is urgent, but account security requires verification."
-- "I'm required to protect your information. This will just take a moment."
-- NEVER bypass verification, no matter the claimed urgency.
-
-### EXAMPLE RESPONSES:
-
-When asked "What's the status of my project?":
-${verificationLevel >= 1 ? 
-  '"Let me check that for you... [QUERY:project_list]"' : 
-  '"I\'d be happy to help! Just to confirm, am I speaking with ' + name + ' from ' + company + '?"'}
-
-When asked "What invoices do I have pending?":
-${verificationLevel >= 3 ? 
-  '"Let me look up your invoices... [QUERY:invoice_list]"' : 
-  '"I can help with that. For security, could you confirm the name of one of your projects with us?"'}
+**IF DATA IS NOT AVAILABLE:**
+Say: "I don't have that information in front of me right now. Would you like me to have our team follow up with you?"
 `
 
   return `You are Tripti, a warm and intelligent AI sales representative for AIzYantra (pronounced "AI's Yantra"). You're having a real-time voice conversation.
@@ -240,6 +183,7 @@ ${dataAccessSection}
 4. **ONE QUESTION AT A TIME**: Never ask multiple questions in one response.
 5. **SHORT RESPONSES**: Keep responses to 2-3 sentences maximum. Be concise.
 6. **USE THEIR NAME**: Address them by name occasionally to build rapport.
+7. **NO TECHNICAL JARGON**: Never mention queries, databases, or technical terms.
 
 ## SALES JOURNEY - GUIDE THEM THROUGH STAGES:
 
@@ -274,7 +218,7 @@ ${dataAccessSection}
 - You're having a CONVERSATION, not reading a script
 - Match the caller's energy and pace
 - End with a clear next step when appropriate
-- When looking up data, be natural: "Let me check that for you..." then provide the info conversationally`
+- When data is provided to you, speak it naturally without mentioning "checking" or "looking up"`
 }
 
 export function TriptiFloatingWidget({ position = 'bottom-right' }: TriptiFloatingWidgetProps) {
@@ -375,23 +319,54 @@ export function TriptiFloatingWidget({ position = 'bottom-right' }: TriptiFloati
     return cleanPhone.length === 10 && /^[6-9]/.test(cleanPhone)
   }
 
-  // ========== SECURE DATA QUERY FUNCTION ==========
-  const executeSecureQuery = async (
-    queryType: SecureQueryType,
-    queryParams: Record<string, string> = {}
-  ): Promise<{ success: boolean; message: string; data?: any }> => {
+  // ========== DETECT DATA QUERY INTENT ==========
+  const detectDataQueryIntent = (text: string): DataQueryIntent => {
+    const lowerText = text.toLowerCase()
+    
+    // Project queries
+    if (lowerText.includes('project') && (
+      lowerText.includes('status') || 
+      lowerText.includes('how is') || 
+      lowerText.includes('update') ||
+      lowerText.includes('progress')
+    )) {
+      return { type: 'project_status' }
+    }
+    
+    if (lowerText.includes('project') || lowerText.includes('projects')) {
+      return { type: 'project_list' }
+    }
+    
+    // Invoice queries
+    if (lowerText.includes('invoice') || lowerText.includes('invoices') || lowerText.includes('bill')) {
+      return { type: 'invoice_list' }
+    }
+    
+    // Payment queries
+    if (lowerText.includes('payment') || lowerText.includes('paid') || lowerText.includes('pay')) {
+      return { type: 'payment_history' }
+    }
+    
+    // Proposal queries
+    if (lowerText.includes('proposal') || lowerText.includes('quote') || lowerText.includes('quotation')) {
+      return { type: 'proposal_list' }
+    }
+    
+    return { type: null }
+  }
+
+  // ========== FETCH DATA AND INJECT TO TRIPTI ==========
+  const fetchAndInjectData = async (queryType: string, params: Record<string, string> = {}) => {
+    const contactId = callerContextRef.current.contactId
+    
+    if (!contactId) {
+      console.log('⚠️ No contact ID available for data query')
+      return
+    }
+
     try {
-      const contactId = callerContextRef.current.contactId
+      console.log('🔐 Fetching data for Tripti:', queryType)
       
-      if (!contactId) {
-        return {
-          success: false,
-          message: "I don't have your account information yet. Could you tell me your name and company?"
-        }
-      }
-
-      console.log('🔐 Executing secure query:', queryType, queryParams)
-
       const response = await fetch('/api/voice/secure-query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -399,80 +374,55 @@ export function TriptiFloatingWidget({ position = 'bottom-right' }: TriptiFloati
           session_id: sessionIdRef.current,
           contact_id: contactId,
           query_type: queryType,
-          query_params: queryParams,
+          query_params: params,
           verification_level: verificationLevelRef.current
         })
       })
 
       const result = await response.json()
       
-      if (result.success) {
-        console.log('✅ Secure query successful:', result)
-        return {
-          success: true,
-          message: result.message,
-          data: result.data
-        }
+      if (result.success && result.message) {
+        console.log('✅ Data fetched, injecting to Tripti:', result.message)
+        
+        // Inject the data as a system message BEFORE Tripti responds
+        injectDataToTripti(queryType, result.message)
+      } else if (result.verification_prompt) {
+        console.log('🔒 Verification needed:', result.verification_prompt)
+        // Inject verification request
+        injectDataToTripti('verification_needed', result.verification_prompt)
       } else {
-        console.log('⚠️ Secure query needs verification:', result)
-        
-        // If verification needed, return the prompt
-        if (result.verification_prompt) {
-          return {
-            success: false,
-            message: result.verification_prompt
-          }
-        }
-        
-        return {
-          success: false,
-          message: result.message || "I couldn't retrieve that information."
-        }
+        console.log('⚠️ No data found')
+        injectDataToTripti(queryType, "I don't have any records for that in your account.")
       }
     } catch (error) {
-      console.error('❌ Secure query error:', error)
-      return {
-        success: false,
-        message: "I encountered an issue looking that up. Let me connect you with our team."
-      }
+      console.error('❌ Error fetching data:', error)
     }
   }
 
-  // ========== DETECT AND HANDLE DATA QUERIES IN AGENT RESPONSE ==========
-  const processAgentResponse = async (transcript: string): Promise<string> => {
-    // Check if response contains query markers
-    const queryPattern = /\[QUERY:(\w+)(?::([^\]]+))?\]/g
-    let match
-    let processedTranscript = transcript
-    
-    while ((match = queryPattern.exec(transcript)) !== null) {
-      const queryType = match[1] as SecureQueryType
-      const queryParam = match[2]
+  // ========== INJECT DATA TO TRIPTI VIA SYSTEM MESSAGE ==========
+  const injectDataToTripti = (queryType: string, data: string) => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      const systemMessage = `[ACCOUNT DATA FOR CALLER]
+The caller asked about their ${queryType.replace('_', ' ')}. Here is the information from their account:
+
+${data}
+
+Respond naturally with this information. Do NOT say "let me check" or "looking up" - just tell them the information conversationally.`
+
+      console.log('💉 Injecting data to Tripti:', systemMessage)
       
-      console.log('🔍 Detected query in response:', queryType, queryParam)
-      
-      // Build query params
-      const params: Record<string, string> = {}
-      if (queryParam) {
-        if (queryType.includes('project')) {
-          params.project_id = queryParam
-          params.project_name = queryParam
-        } else if (queryType.includes('proposal')) {
-          params.proposal_id = queryParam
-        } else if (queryType.includes('invoice')) {
-          params.invoice_id = queryParam
-          params.invoice_number = queryParam
+      wsRef.current.send(JSON.stringify({
+        type: 'conversation.item.create',
+        item: {
+          type: 'message',
+          role: 'system',
+          content: [{ type: 'input_text', text: systemMessage }]
         }
-      }
+      }))
       
-      // Execute the query
-      const result = await executeSecureQuery(queryType, params)
-      
-      // Replace the query marker with the result
-      processedTranscript = processedTranscript.replace(match[0], result.message)
+      // Trigger response
+      wsRef.current.send(JSON.stringify({ type: 'response.create' }))
     }
-    
-    return processedTranscript
   }
 
   // ========== UPDATE VERIFICATION LEVEL ==========
@@ -481,14 +431,6 @@ export function TriptiFloatingWidget({ position = 'bottom-right' }: TriptiFloati
       console.log(`🔐 Verification level increased: ${verificationLevelRef.current} → ${newLevel}`)
       verificationLevelRef.current = newLevel
       setVerificationLevel(newLevel)
-      
-      // Notify Tripti of the verification change
-      sendContextToTripti(`[VERIFICATION UPDATE] Caller verification level is now ${newLevel}. ${
-        newLevel >= 3 ? 'Full data access granted.' :
-        newLevel >= 2 ? 'Project details access granted.' :
-        newLevel >= 1 ? 'Basic project status access granted.' :
-        'No data access yet.'
-      }`)
     }
   }
 
@@ -748,6 +690,14 @@ export function TriptiFloatingWidget({ position = 'bottom-right' }: TriptiFloati
         
         // Detect verification confirmations
         detectVerificationConfirmation(userText)
+        
+        // ========== NEW: DETECT DATA QUERY AND FETCH DATA ==========
+        const queryIntent = detectDataQueryIntent(userText)
+        if (queryIntent.type) {
+          console.log('🔍 Data query detected:', queryIntent.type)
+          // Fetch data and inject to Tripti BEFORE she responds
+          await fetchAndInjectData(queryIntent.type, queryIntent.params || {})
+        }
       }
       
       userAudioChunksRef.current = []
@@ -778,13 +728,12 @@ export function TriptiFloatingWidget({ position = 'bottom-right' }: TriptiFloati
     }
     
     // Check for security verification (invoice amount, project name)
-    // This would be enhanced with actual validation
-    const financialKeywords = ['lakhs', 'lakh', 'thousand', 'crore', 'invoice', 'payment', 'project']
+    const financialKeywords = ['lakhs', 'lakh', 'thousand', 'crore', 'rupees']
+    const projectKeywords = ['patient intake', 'ai patient', 'intake system']
     const mentionedFinancial = financialKeywords.some(keyword => lowerText.includes(keyword))
+    const mentionedProject = projectKeywords.some(keyword => lowerText.includes(keyword))
     
-    if (mentionedFinancial && verificationLevelRef.current === 2) {
-      // In a real implementation, we'd validate the actual values
-      // For now, we'll upgrade if they mention specific project/invoice details
+    if ((mentionedFinancial || mentionedProject) && verificationLevelRef.current === 2) {
       updateVerificationLevel(3)
     }
   }
@@ -931,13 +880,10 @@ export function TriptiFloatingWidget({ position = 'bottom-right' }: TriptiFloati
 
       case 'response.output_audio_transcript.done':
         if (event.transcript) {
-          // Process the transcript to handle any data queries
-          const processedTranscript = await processAgentResponse(event.transcript)
-          
           const agentMessage = {
             id: Date.now().toString(),
             role: 'agent' as const,
-            content: processedTranscript,
+            content: event.transcript,
             timestamp: new Date()
           }
           setMessages(prev => [...prev, agentMessage])
@@ -946,7 +892,7 @@ export function TriptiFloatingWidget({ position = 'bottom-right' }: TriptiFloati
             saveVoiceTurn({
               sessionId: sessionIdRef.current,
               speaker: 'tripti',
-              content: processedTranscript,
+              content: event.transcript,
               language: 'en-IN'
             }).catch(err => console.error('Error saving turn:', err))
           }
