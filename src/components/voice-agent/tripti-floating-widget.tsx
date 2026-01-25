@@ -947,6 +947,31 @@ export function TriptiFloatingWidget({ position = 'bottom-right' }: TriptiFloati
     }
   }
 
+  // ========== 🆕 TRIGGER POST-CALL AUTOMATION (n8n webhook) ==========
+  const triggerPostCallAutomation = async (sessionId: string) => {
+    try {
+      console.log('🔄 Triggering post-call automation for session:', sessionId)
+      
+      const response = await fetch('/api/voice/session-complete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sessionId }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('✅ Post-call automation triggered:', data)
+      } else {
+        const error = await response.json()
+        console.error('❌ Post-call automation failed:', error)
+      }
+    } catch (error) {
+      console.error('❌ Error triggering post-call automation:', error)
+    }
+  }
+
   // ========== HANDLE SESSION END ==========
   const handleSessionEnd = async () => {
     if (sessionIdRef.current && dbSessionIdRef.current) {
@@ -976,6 +1001,14 @@ export function TriptiFloatingWidget({ position = 'bottom-right' }: TriptiFloati
         intent,
         currentFormData.purpose || undefined  // objective_captured
       )
+
+      // 🆕 TRIGGER POST-CALL AUTOMATION (n8n webhook)
+      // This sends all session data to n8n for:
+      // - AI-generated call summary
+      // - Email notification to sales team
+      // - CRM follow-up task creation
+      // - Lead record update with AI insights
+      await triggerPostCallAutomation(sessionIdRef.current)
     }
   }
 
