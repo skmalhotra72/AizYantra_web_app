@@ -1,144 +1,214 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { useState } from "react";
 import { LucideIcon } from "lucide-react";
+import { useState } from "react";
 
-interface BentoGridProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+// ═══════════════════════════════════════════════════════════════
+// Types
+// ═══════════════════════════════════════════════════════════════
 
-export function BentoGrid({ className, children }: BentoGridProps) {
-  return (
-    <div
-      className={cn(
-        "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-7xl mx-auto",
-        className
-      )}
-    >
-      {children}
-    </div>
-  );
-}
-
-interface BentoGridItemProps {
-  className?: string;
+export interface BentoItem {
   title: string;
   description: string;
-  example: string;
+  example?: string;
   icon: LucideIcon;
-  index?: number;
-  colSpan?: 1 | 2;
-  rowSpan?: 1 | 2;
 }
 
-export function BentoGridItem({
-  className,
-  title,
-  description,
-  example,
-  icon: Icon,
-  index = 0,
-  colSpan = 1,
-  rowSpan = 1,
-}: BentoGridItemProps) {
+interface UniformBentoGridProps {
+  items: BentoItem[];
+  className?: string;
+  maxItems?: number;
+}
+
+interface BentoCardProps {
+  item: BentoItem;
+  index: number;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BentoCard Component - Individual uniform card
+// ═══════════════════════════════════════════════════════════════
+
+function BentoCard({ item, index }: BentoCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const Icon = item.icon;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, delay: index * 0.05 }}
+      transition={{ duration: 0.4, delay: index * 0.05 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={cn(
-        "group relative rounded-2xl overflow-hidden",
-        "bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm",
-        "border border-gray-200/50 dark:border-white/10",
-        "hover:border-cyan-500/50 dark:hover:border-cyan-500/50",
-        "hover:shadow-xl hover:shadow-cyan-500/10",
-        "transition-all duration-300 cursor-pointer",
-        "p-6 flex flex-col justify-between",
-        colSpan === 2 && "md:col-span-2",
-        rowSpan === 2 && "md:row-span-2",
-        rowSpan === 1 ? "min-h-[180px]" : "min-h-[380px]",
-        className
-      )}
+      className="group relative h-full"
     >
-      {/* Background gradient on hover */}
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        initial={false}
-        animate={{ opacity: isHovered ? 1 : 0 }}
-      />
+      <div
+        className={`
+          relative h-full overflow-hidden
+          rounded-xl p-4 sm:p-5
+          bg-crust/80 backdrop-blur-sm
+          border border-surface-0/50
+          transition-all duration-300 ease-out
+          flex flex-col
+          ${isHovered 
+            ? "border-sky/50 shadow-lg shadow-sky/10 scale-[1.02]" 
+            : "hover:border-surface-1"
+          }
+        `}
+      >
+        {/* Background gradient on hover */}
+        <div 
+          className={`
+            absolute inset-0 opacity-0 transition-opacity duration-300
+            bg-gradient-to-br from-sky/10 via-transparent to-teal/10
+            ${isHovered ? "opacity-100" : ""}
+          `}
+        />
 
-      {/* Animated border glow */}
-      <motion.div
-        className="absolute inset-0 rounded-2xl"
-        initial={false}
-        animate={{
-          boxShadow: isHovered
-            ? "inset 0 0 30px rgba(0, 200, 200, 0.1)"
-            : "inset 0 0 0px rgba(0, 200, 200, 0)",
-        }}
-        transition={{ duration: 0.3 }}
-      />
-
-      {/* Content */}
-      <div className="relative z-10">
         {/* Icon */}
-        <motion.div
-          className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-teal-500/20 
-                     flex items-center justify-center mb-4
-                     group-hover:from-cyan-500/30 group-hover:to-teal-500/30
-                     transition-colors duration-300"
-          animate={{ rotate: isHovered ? 5 : 0 }}
-          transition={{ type: "spring", stiffness: 300 }}
-        >
-          <Icon className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
-        </motion.div>
-
-        {/* Title */}
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          {title}
-        </h3>
-
-        {/* Description - shows on hover */}
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ 
-            opacity: isHovered ? 1 : 0, 
-            height: isHovered ? "auto" : 0 
-          }}
-          transition={{ duration: 0.2 }}
-          className="overflow-hidden"
-        >
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-            {description}
-          </p>
-          
-          {/* Example */}
-          <div className="flex items-start gap-2 text-xs">
-            <span className="text-cyan-500 font-medium shrink-0">e.g.</span>
-            <span className="text-gray-500 dark:text-gray-500 italic">
-              {example}
-            </span>
+        <div className="relative z-10 mb-3">
+          <div 
+            className={`
+              w-10 h-10 sm:w-12 sm:h-12 rounded-lg
+              flex items-center justify-center
+              transition-all duration-300
+              ${isHovered 
+                ? "bg-sky/20 text-sky" 
+                : "bg-surface-0/50 text-subtext-0"
+              }
+            `}
+          >
+            <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-        </motion.div>
-      </div>
+        </div>
 
-      {/* Bottom decoration line */}
-      <motion.div
-        className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-cyan-500 to-teal-500"
-        initial={{ width: "0%" }}
-        animate={{ width: isHovered ? "100%" : "0%" }}
-        transition={{ duration: 0.3 }}
-      />
+        {/* Content */}
+        <div className="relative z-10 flex-1 flex flex-col">
+          {/* Title */}
+          <h3 
+            className={`
+              text-sm sm:text-base font-semibold mb-1.5
+              transition-colors duration-300
+              ${isHovered ? "text-sky" : "text-text"}
+            `}
+          >
+            {item.title}
+          </h3>
+
+          {/* Description - shows on hover, hidden on mobile by default */}
+          <p 
+            className={`
+              text-xs sm:text-sm text-subtext-1 leading-relaxed
+              transition-all duration-300
+              line-clamp-2 sm:line-clamp-3
+              ${isHovered ? "text-subtext-0" : ""}
+            `}
+          >
+            {isHovered && item.example ? item.example : item.description}
+          </p>
+        </div>
+
+        {/* Bottom accent line */}
+        <div 
+          className={`
+            absolute bottom-0 left-0 right-0 h-0.5
+            bg-gradient-to-r from-sky via-teal to-sapphire
+            transition-all duration-300 origin-left
+            ${isHovered ? "scale-x-100 opacity-100" : "scale-x-0 opacity-0"}
+          `}
+        />
+      </div>
     </motion.div>
   );
 }
 
-export default BentoGrid;
+// ═══════════════════════════════════════════════════════════════
+// UniformBentoGrid Component - 4x4 Grid
+// ═══════════════════════════════════════════════════════════════
+
+export function UniformBentoGrid({ 
+  items, 
+  className = "",
+  maxItems = 16 
+}: UniformBentoGridProps) {
+  // Limit to maxItems (default 16 for 4x4)
+  const displayItems = items.slice(0, maxItems);
+
+  return (
+    <div 
+      className={`
+        grid 
+        grid-cols-2 
+        sm:grid-cols-3 
+        lg:grid-cols-4
+        gap-3 sm:gap-4 lg:gap-5
+        auto-rows-[140px] sm:auto-rows-[160px] lg:auto-rows-[180px]
+        ${className}
+      `}
+    >
+      {displayItems.map((item, index) => (
+        <BentoCard key={item.title} item={item} index={index} />
+      ))}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Legacy BentoGrid Exports (for backward compatibility)
+// ═══════════════════════════════════════════════════════════════
+
+interface LegacyBentoGridProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export function BentoGrid({ children, className = "" }: LegacyBentoGridProps) {
+  return (
+    <div 
+      className={`
+        grid 
+        grid-cols-2 
+        sm:grid-cols-3 
+        lg:grid-cols-4
+        gap-3 sm:gap-4 lg:gap-5
+        auto-rows-[140px] sm:auto-rows-[160px] lg:auto-rows-[180px]
+        ${className}
+      `}
+    >
+      {children}
+    </div>
+  );
+}
+
+interface LegacyBentoGridItemProps {
+  title: string;
+  description: string;
+  example?: string;
+  icon: LucideIcon;
+  index?: number;
+  colSpan?: 1 | 2;  // Ignored in uniform grid
+  rowSpan?: 1 | 2;  // Ignored in uniform grid
+}
+
+export function BentoGridItem({ 
+  title, 
+  description, 
+  example, 
+  icon,
+  index = 0,
+}: LegacyBentoGridItemProps) {
+  return (
+    <BentoCard 
+      item={{ title, description, example, icon }} 
+      index={index} 
+    />
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Default Export
+// ═══════════════════════════════════════════════════════════════
+
+export default UniformBentoGrid;

@@ -71,17 +71,34 @@ export function ExpandableTags() {
   ];
 
   return (
-    <div className="flex flex-wrap gap-3 justify-center items-center">
-      {tags.map((tag, index) => (
-        <motion.div
-          key={tag.label}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1 + 0.3 }}
-        >
-          <ExpandableTag {...tag} />
-        </motion.div>
-      ))}
+    <div className="flex flex-col items-center md:items-start gap-3">
+      {/* Mobile: horizontal row, centered */}
+      <div className="flex flex-wrap gap-3 justify-center md:hidden">
+        {tags.map((tag, index) => (
+          <motion.div
+            key={tag.label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 + 0.3 }}
+          >
+            <ExpandableTag {...tag} />
+          </motion.div>
+        ))}
+      </div>
+      
+      {/* Desktop: vertical stack, left-aligned */}
+      <div className="hidden md:flex flex-col items-start gap-3">
+        {tags.map((tag, index) => (
+          <motion.div
+            key={tag.label}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 + 0.3 }}
+          >
+            <ExpandableTag {...tag} />
+          </motion.div>
+        ))}
+      </div>
     </div>
   );
 }

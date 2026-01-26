@@ -2,9 +2,61 @@
 
 import { motion } from "framer-motion";
 import { ExpandableTags } from "@/components/ui/expandable-tags";
-import { Globe, GlobeStats } from "@/components/ui/globe";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+
+// Dynamic import for the new NetworkGlobe (SSR disabled for Three.js)
+const NetworkGlobe = dynamic(() => import("@/components/Globe/NetworkGlobe"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[400px] md:h-[500px] flex items-center justify-center">
+      <div className="relative">
+        {/* Outer ring */}
+        <div 
+          className="w-24 h-24 rounded-full border-2 border-cyan-500/30 animate-spin" 
+          style={{ animationDuration: "3s" }} 
+        />
+        {/* Inner ring */}
+        <div 
+          className="absolute inset-3 rounded-full border-2 border-teal-500/20 animate-spin" 
+          style={{ animationDuration: "2s", animationDirection: "reverse" }} 
+        />
+        {/* Center dot */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-3 h-3 rounded-full bg-cyan-500/50 animate-pulse" />
+        </div>
+      </div>
+    </div>
+  ),
+});
+
+// Globe Stats Component (preserved from original)
+function GlobeStats() {
+  const stats = [
+    { value: "100+", label: "Countries" },
+    { value: "40+", label: "Languages" },
+    { value: "99.9%", label: "Uptime" },
+  ];
+
+  return (
+    <div className="flex items-center justify-center gap-6">
+      {stats.map((stat, index) => (
+        <div key={stat.label} className="text-center">
+          <div className="text-xl font-bold bg-gradient-to-r from-cyan-500 to-teal-500 bg-clip-text text-transparent">
+            {stat.value}
+          </div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            {stat.label}
+          </div>
+          {index < stats.length - 1 && (
+            <div className="hidden" /> // Divider handled by gap
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function HeroYantra() {
   return (
@@ -120,18 +172,18 @@ export function HeroYantra() {
             </motion.div>
           </div>
 
-          {/* Right Column - Globe */}
+          {/* Right Column - Network Globe */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="flex flex-col items-center order-1 lg:order-2"
           >
-            {/* Globe */}
-            <div className="relative">
-              <Globe size={350} className="mx-auto" />
+            {/* New Network Globe with arc connections */}
+            <div className="relative w-full max-w-[500px]">
+              <NetworkGlobe className="w-full" />
               
-              {/* Glassmorphic card overlay */}
+              {/* Glassmorphic stats card overlay */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
