@@ -23,6 +23,7 @@ import {
   updateAssessmentProgress,
   completeAssessment,
   logActivity,
+  saveAssessmentResults,
 } from "@/lib/assessment-db";
 
 // ═══════════════════════════════════════════════════════════════
@@ -488,13 +489,57 @@ export default function AIAssessmentPage() {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // Mark assessment as completed
-      if (state.assessmentId) {
-        await completeAssessment(state.assessmentId, state.timeSpent);
-      }
-
       // Generate personalized results via AI
       const results = await generateResults();
+
+      // Save results to database FIRST (required for CRM integration)
+      if (state.assessmentId) {
+        const determineReadinessLevel = (score: number): string => {
+          if (score >= 80) return 'Leader';
+          if (score >= 65) return 'Advanced';
+          if (score >= 50) return 'Established';
+          if (score >= 35) return 'Developing';
+          return 'Beginner';
+        };
+
+        await saveAssessmentResults(state.assessmentId, {
+          overall_score: state.overallScore,
+          readiness_level: determineReadinessLevel(state.overallScore),
+          dimension_scores: state.dimensionScores,
+          strengths: results.strengths,
+          gaps: results.opportunities, // Using opportunities as gaps
+          recommendations: results.recommendations,
+        });
+
+        // Mark assessment as completed
+        await completeAssessment(state.assessmentId, state.timeSpent);
+        
+        // ✅ Trigger CRM integration (after results are saved)
+        try {
+          console.log('🔄 Triggering CRM integration for assessment:', state.assessmentId);
+          
+          const crmResponse = await fetch('/api/assessment/integrate-crm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'integrate_single',
+              assessmentId: state.assessmentId
+            })
+          });
+
+          const crmResult = await crmResponse.json();
+          
+          if (crmResult.success) {
+            console.log('✅ CRM integration successful:', crmResult.data);
+          } else {
+            console.warn('⚠️ CRM integration failed:', crmResult.error);
+            // Don't block the assessment completion if CRM fails
+          }
+        } catch (crmError) {
+          console.error('❌ CRM integration error:', crmError);
+          // Continue anyway - CRM integration failure shouldn't break the assessment
+        }
+      }
 
       setState((prev) => ({
         ...prev,

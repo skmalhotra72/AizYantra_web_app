@@ -1,9 +1,11 @@
 // ═══════════════════════════════════════════════════════════════
 // AIzYantra AI Assessment - Supabase Client Helpers
 // Path: src/lib/assessment-db.ts
+// WITH CRM INTEGRATION ENABLED
 // ═══════════════════════════════════════════════════════════════
 
 import { createClient } from '@supabase/supabase-js';
+import { integrateAssessmentWithCRM } from './crm-integration';
 
 // ═══════════════════════════════════════════════════════════════
 // Types
@@ -193,57 +195,58 @@ export async function getUserBySessionToken(token: string): Promise<{ user: Asse
 }
 
 // ═══════════════════════════════════════════════════════════════
-// Lead Functions - FIXED VERSION
+// Lead Functions - WITH CRM INTEGRATION
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * Create a lead from assessment user
- * FIXED: Now handles different leads table schemas gracefully
+ * Create a lead from assessment user using CRM integration
  */
 export async function createLead(userId: string, userData: AssessmentUser): Promise<{ lead: Lead | null; error: string | null }> {
-  try {
-    // Try inserting with common columns that likely exist in your leads table
-    const { data, error } = await supabase
-      .from('leads')
-      .insert([{
-        name: userData.name,
-        email: userData.email,
-        phone: userData.phone,
-        company: userData.organization_name,
-        source: 'ai_assessment',
-        status: 'new',
-      }])
-      .select()
-      .single();
+  // Lead will be created via CRM integration when assessment is completed
+  // This is now a placeholder that returns null
+  console.log('Lead will be created via CRM integration upon assessment completion');
+  return { lead: null, error: null };
+}
 
-    if (error) {
-      // If that fails, try with even more minimal columns
-      console.warn("Lead insert with standard columns failed:", error.message);
-      
-      // Try minimal insert with just name and email
-      const { data: minimalData, error: minimalError } = await supabase
-        .from('leads')
-        .insert([{
-          name: userData.name,
-          email: userData.email,
-        }])
-        .select()
-        .single();
-      
-      if (minimalError) {
-        // Log but don't throw - lead creation is not critical for assessment flow
-        console.warn("Lead creation failed completely:", minimalError.message);
-        return { lead: null, error: minimalError.message };
-      }
-      
-      return { lead: minimalData, error: null };
+/**
+ * Create lead via CRM integration (called after assessment completion)
+ */
+export async function createLeadWithCRM(
+  assessmentUser: AssessmentUser,
+  assessmentResult: {
+    overall_score: number;
+    strengths?: string[];
+    gaps?: string[];
+    recommendations?: string[];
+  }
+): Promise<{ leadId: string | null; error: string | null }> {
+  try {
+    if (!assessmentUser.id) {
+      throw new Error('Assessment user ID is required');
     }
 
-    return { lead: data, error: null };
+    const result = await integrateAssessmentWithCRM(
+      {
+        id: assessmentUser.id,
+        name: assessmentUser.name,
+        email: assessmentUser.email,
+        phone: assessmentUser.phone,
+        organization_name: assessmentUser.organization_name,
+        designation: assessmentUser.designation,
+        organization_size: assessmentUser.organization_size,
+        industry: assessmentUser.industry,
+      },
+      assessmentResult
+    );
+
+    if (result.success) {
+      return { leadId: result.leadId, error: null };
+    } else {
+      return { leadId: null, error: result.error || 'CRM integration failed' };
+    }
   } catch (error: any) {
-    // Don't block the assessment flow if lead creation fails
-    console.error('Error creating lead:', error);
-    return { lead: null, error: error.message };
+    console.error('Error creating lead with CRM:', error);
+    return { leadId: null, error: error.message };
   }
 }
 
@@ -260,10 +263,10 @@ export async function updateLeadScore(leadId: string, score: number): Promise<vo
         ai_readiness_score: score,
         lead_score: Math.round(score * 0.8),
         priority,
+        updated_at: new Date().toISOString(),
       })
       .eq('id', leadId);
   } catch (error) {
-    // Don't block - this is not critical
     console.warn('Could not update lead score:', error);
   }
 }
@@ -347,7 +350,7 @@ export async function createAssessment(
         tier,
         status: 'not_started',
         current_step: 0,
-        total_steps: totalSteps || 7, // Default to 7 if count fails
+        total_steps: totalSteps || 7,
         current_dimension: 1,
         time_spent_seconds: 0,
         session_token: sessionToken,
@@ -358,7 +361,6 @@ export async function createAssessment(
 
     if (error) throw error;
 
-    // Log activity (don't await - fire and forget)
     logActivity(data.id, userId, 'created', { tier }).catch(() => {});
 
     return { assessment: data, error: null };
@@ -436,7 +438,7 @@ export async function updateAssessmentProgress(
 }
 
 /**
- * Complete assessment
+ * Complete assessment and trigger CRM integration
  */
 export async function completeAssessment(assessmentId: string, timeSpent: number): Promise<void> {
   await supabase
@@ -452,6 +454,37 @@ export async function completeAssessment(assessmentId: string, timeSpent: number
   if (assessment) {
     logActivity(assessmentId, assessment.user_id, 'completed', { timeSpent }).catch(() => {});
   }
+}
+
+/**
+ * Complete assessment with CRM integration
+ */
+export async function completeAssessmentWithCRM(
+  assessmentId: string,
+  timeSpent: number,
+  assessmentUser: AssessmentUser,
+  assessmentResult: {
+    overall_score: number;
+    strengths?: string[];
+    gaps?: string[];
+    recommendations?: string[];
+  }
+): Promise<{ leadId: string | null }> {
+  // Mark assessment as completed
+  await completeAssessment(assessmentId, timeSpent);
+
+  // Create lead via CRM integration
+  const { leadId } = await createLeadWithCRM(assessmentUser, assessmentResult);
+
+  // Update assessment with lead_id
+  if (leadId) {
+    await supabase
+      .from('assessments')
+      .update({ lead_id: leadId })
+      .eq('id', assessmentId);
+  }
+
+  return { leadId };
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -590,15 +623,65 @@ export async function calculateAndSaveResults(assessmentId: string): Promise<{ r
 
     if (error) throw error;
 
-    const assessment = await getAssessment(assessmentId);
-    if (assessment?.lead_id) {
-      updateLeadScore(assessment.lead_id, overallScore).catch(() => {});
-    }
-
     return { result: data, error: null };
   } catch (error: any) {
     console.error('Error calculating results:', error);
     return { result: null, error: error.message };
+  }
+}
+
+/**
+ * Save AI-generated assessment results (for AI-powered assessments)
+ */
+export async function saveAssessmentResults(
+  assessmentId: string,
+  results: {
+    overall_score: number;
+    readiness_level: string;
+    dimension_scores: Record<string, number>;
+    strengths: string[];
+    gaps: string[];
+    recommendations: any[];
+  }
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    // Convert dimension_scores format
+    const formattedDimensionScores: Record<string, { score: number; max: number; level: string }> = {};
+    Object.entries(results.dimension_scores).forEach(([dimension, score]) => {
+      formattedDimensionScores[dimension] = {
+        score: score,
+        max: 100,
+        level: getReadinessLevel(score),
+      };
+    });
+
+    // Create radar_data
+    const radarData = Object.entries(results.dimension_scores).map(([dimension, score]) => ({
+      dimension,
+      score,
+      benchmark: 50,
+    }));
+
+    const { error } = await supabase
+      .from('assessment_results')
+      .insert([{
+        assessment_id: assessmentId,
+        overall_score: results.overall_score,
+        readiness_level: results.readiness_level,
+        dimension_scores: formattedDimensionScores,
+        radar_data: radarData,
+        strengths: results.strengths,
+        gaps: results.gaps,
+        recommendations: results.recommendations,
+        calculated_at: new Date().toISOString(),
+      }]);
+
+    if (error) throw error;
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error saving assessment results:', error);
+    return { success: false, error: error.message };
   }
 }
 
@@ -639,7 +722,6 @@ export async function logActivity(
         details,
       }]);
   } catch (error) {
-    // Don't throw - logging is not critical
     console.warn('Activity log failed:', error);
   }
 }
@@ -648,16 +730,10 @@ export async function logActivity(
 // Helper Functions
 // ═══════════════════════════════════════════════════════════════
 
-/**
- * Generate a session token for anonymous access
- */
 function generateSessionToken(): string {
   return `sess_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
 }
 
-/**
- * Get readiness level from score
- */
 function getReadinessLevel(score: number): string {
   if (score >= 80) return 'Leader';
   if (score >= 65) return 'Advanced';
@@ -666,9 +742,6 @@ function getReadinessLevel(score: number): string {
   return 'Beginner';
 }
 
-/**
- * Generate recommendations based on scores
- */
 function generateRecommendations(
   scores: Record<string, { score: number; max: number; level: string }>,
   dimensions: AssessmentDimension[]
@@ -690,9 +763,5 @@ function generateRecommendations(
 
   return recommendations.slice(0, 5);
 }
-
-// ═══════════════════════════════════════════════════════════════
-// Export default client
-// ═══════════════════════════════════════════════════════════════
 
 export default supabase;
