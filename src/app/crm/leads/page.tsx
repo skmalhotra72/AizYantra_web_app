@@ -67,8 +67,18 @@ const formatCurrency = (value: number) => {
   }
   return `₹${value.toLocaleString()}`
 }
+import { Suspense } from 'react'
+function LeadsPageContent() {
+  // Keep everything exactly as is
+}
 
 export default function LeadsPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+      <LeadsPageContent />
+    </Suspense>
+  )
+}
   const searchParams = useSearchParams()
   const sourceFromUrl = searchParams.get('source') || 'all'
 
