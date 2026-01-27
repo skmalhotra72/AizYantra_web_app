@@ -18,9 +18,14 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Bell,
   Search,
   Menu,
+  Brain,
+  Lightbulb,
+  Phone,
+  MessageSquare,
 } from 'lucide-react'
 
 interface UserProfile {
@@ -34,13 +39,37 @@ interface UserProfile {
 interface TeamMember {
   name: string
   role: string
-  department: string
   photo_url?: string
 }
 
-const navItems = [
+interface NavItem {
+  name: string
+  href?: string
+  icon: any
+  children?: NavItem[]
+  badge?: number
+}
+
+const navItems: NavItem[] = [
   { name: 'Dashboard', href: '/crm', icon: LayoutDashboard },
-  { name: 'Leads', href: '/crm/leads', icon: Users },
+  { 
+    name: 'Leads', 
+    icon: Users,
+    children: [
+      { name: 'All Leads', href: '/crm/leads', icon: Users },
+      { name: 'Voice Agent', href: '/crm/leads?source=voice_agent', icon: Phone },
+      { name: 'AI Assessment', href: '/crm/leads?source=ai_assessment', icon: Brain },
+      { name: 'Voice Calls', href: '/crm/leads?source=voice_call', icon: MessageSquare },
+    ]
+  },
+  { 
+    name: 'Innovation', 
+    icon: Lightbulb,
+    children: [
+      { name: 'Dashboard', href: '/crm/innovation', icon: LayoutDashboard },
+      { name: 'Submit Idea', href: '/crm/innovation/ideas/new', icon: Lightbulb },
+    ]
+  },
   { name: 'Pipeline', href: '/crm/pipeline', icon: Kanban },
   { name: 'Contacts', href: '/crm/contacts', icon: UserCircle },
   { name: 'Organizations', href: '/crm/organizations', icon: Building2 },
@@ -59,6 +88,7 @@ export default function CRMNav() {
   const [user, setUser] = useState<UserProfile | null>(null)
   const [teamMember, setTeamMember] = useState<TeamMember | null>(null)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [expandedMenus, setExpandedMenus] = useState<string[]>(['Leads', 'Innovation'])
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -80,10 +110,10 @@ export default function CRMNav() {
 
         // Fetch team member details
         const { data: member } = await supabase
-          .from('team_members')
-          .select('name, role, department, photo_url')
-          .eq('user_id', authUser.id)
-          .single()
+        .from('team_members')
+        .select('name, role')
+        .eq('user_id', authUser.id)
+        .single()
         
         if (member) {
           setTeamMember(member)
@@ -102,19 +132,44 @@ export default function CRMNav() {
     router.refresh()
   }
 
+  const toggleMenu = (menuName: string) => {
+    setExpandedMenus(prev => 
+      prev.includes(menuName) 
+        ? prev.filter(m => m !== menuName)
+        : [...prev, menuName]
+    )
+  }
+
+  const isMenuExpanded = (menuName: string) => {
+    return expandedMenus.includes(menuName)
+  }
+
+  const isItemActive = (item: NavItem): boolean => {
+    if (item.href) {
+      // Extract base path without query params for comparison
+      const basePath = item.href.split('?')[0]
+      const currentBasePath = pathname.split('?')[0]
+      
+      return currentBasePath === basePath || 
+        (basePath !== '/crm' && currentBasePath.startsWith(basePath))
+    }
+    if (item.children) {
+      return item.children.some(child => isItemActive(child))
+    }
+    return false
+  }
+
   const getRoleLabel = (role: string) => {
     const labels: Record<string, string> = {
       'super_admin': 'Super Admin',
       'admin': 'Admin',
       'team_member': 'Team Member',
-      'ceo': 'CEO',
-      'cpo': 'CPO',
-      'cmo': 'CMO',
-      'cto': 'CTO',
-      'tech_lead': 'Tech Lead',
-      'analytics_lead': 'Analytics Lead',
-      'advisor': 'Advisor',
-      'customer_success': 'Customer Success',
+      'CEO': 'CEO',
+      'CPO': 'CPO',
+      'CMO': 'CMO',
+      'CTO': 'CTO',
+      'Director Business Development': 'Director BizDev',
+      'Engineer': 'Engineer',
     }
     return labels[role] || role
   }
@@ -126,6 +181,71 @@ export default function CRMNav() {
       .join('')
       .toUpperCase()
       .slice(0, 2)
+  }
+
+  const renderNavItem = (item: NavItem, isChild: boolean = false) => {
+    const isActive = isItemActive(item)
+    const hasChildren = item.children && item.children.length > 0
+    const isExpanded = isMenuExpanded(item.name)
+
+    if (hasChildren && !isCollapsed) {
+      // Parent item with children
+      return (
+        <div key={item.name}>
+          <button
+            onClick={() => toggleMenu(item.name)}
+            className={`
+              w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all
+              ${isActive 
+                ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30' 
+                : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+              }
+            `}
+          >
+            <div className="flex items-center gap-3">
+              <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-teal-400' : ''}`} />
+              <span className="text-sm font-medium">{item.name}</span>
+            </div>
+            <ChevronDown 
+              className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+            />
+          </button>
+          
+          {/* Children */}
+          {isExpanded && (
+            <div className="ml-4 mt-1 space-y-1 border-l border-slate-700 pl-2">
+              {item.children.map(child => renderNavItem(child, true))}
+            </div>
+          )}
+        </div>
+      )
+    }
+
+    // Regular item or child item
+    if (item.href) {
+      return (
+        <Link
+          key={item.name}
+          href={item.href}
+          onClick={() => setIsMobileOpen(false)}
+          className={`
+            flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all
+            ${isActive 
+              ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30' 
+              : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+            }
+            ${isCollapsed ? 'justify-center' : ''}
+            ${isChild ? 'text-sm' : ''}
+          `}
+          title={isCollapsed ? item.name : undefined}
+        >
+          <item.icon className={`w-${isChild ? '4' : '5'} h-${isChild ? '4' : '5'} shrink-0 ${isActive ? 'text-teal-400' : ''}`} />
+          {!isCollapsed && <span className={`${isChild ? 'text-xs' : 'text-sm'} font-medium`}>{item.name}</span>}
+        </Link>
+      )
+    }
+
+    return null
   }
 
   return (
@@ -186,30 +306,7 @@ export default function CRMNav() {
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || 
-              (item.href !== '/crm' && pathname.startsWith(item.href))
-            
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={() => setIsMobileOpen(false)}
-                className={`
-                  flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all
-                  ${isActive 
-                    ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30' 
-                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                  }
-                  ${isCollapsed ? 'justify-center' : ''}
-                `}
-                title={isCollapsed ? item.name : undefined}
-              >
-                <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-teal-400' : ''}`} />
-                {!isCollapsed && <span className="text-sm font-medium">{item.name}</span>}
-              </Link>
-            )
-          })}
+          {navItems.map(item => renderNavItem(item))}
         </nav>
 
         {/* User section */}

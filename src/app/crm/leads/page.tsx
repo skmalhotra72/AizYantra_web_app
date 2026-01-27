@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { 
   Search,
@@ -23,138 +24,7 @@ import {
   DollarSign,
   Tag
 } from 'lucide-react'
-
-// Mock data - will be replaced with Supabase
-const allLeads = [
-  { 
-    id: '1',
-    leadNumber: 'LEAD-2026-0001',
-    organization: 'Apollo Hospitals',
-    contact: 'Dr. Rajesh Kumar',
-    email: 'rajesh.kumar@apollo.com',
-    phone: '+91 98765 43210',
-    status: 'qualified',
-    source: 'LinkedIn',
-    expectedValue: 2500000,
-    probability: 60,
-    serviceInterest: ['Voice Agents', 'AI Chatbots'],
-    assignedTo: 'Sanjeev Malhotra',
-    createdAt: '2026-01-20',
-    lastActivity: '2 hours ago'
-  },
-  { 
-    id: '2',
-    leadNumber: 'LEAD-2026-0002',
-    organization: 'Max Healthcare',
-    contact: 'Priya Sharma',
-    email: 'priya.sharma@maxhealthcare.com',
-    phone: '+91 98765 43211',
-    status: 'new',
-    source: 'Website',
-    expectedValue: 1500000,
-    probability: 20,
-    serviceInterest: ['Workflow Automation'],
-    assignedTo: 'Kunal Bellur',
-    createdAt: '2026-01-20',
-    lastActivity: '5 hours ago'
-  },
-  { 
-    id: '3',
-    leadNumber: 'LEAD-2026-0003',
-    organization: 'Fortis Diagnostics',
-    contact: 'Amit Verma',
-    email: 'amit.v@fortis.com',
-    phone: '+91 98765 43212',
-    status: 'proposal',
-    source: 'Referral',
-    expectedValue: 3500000,
-    probability: 75,
-    serviceInterest: ['AI Integration', 'Custom Development'],
-    assignedTo: 'Sanjeev Malhotra',
-    createdAt: '2026-01-19',
-    lastActivity: '1 day ago'
-  },
-  { 
-    id: '4',
-    leadNumber: 'LEAD-2026-0004',
-    organization: 'Medanta Labs',
-    contact: 'Dr. Sneha Gupta',
-    email: 's.gupta@medanta.org',
-    phone: '+91 98765 43213',
-    status: 'contacted',
-    source: 'Voice Agent',
-    expectedValue: 2000000,
-    probability: 40,
-    serviceInterest: ['Voice Agents'],
-    assignedTo: 'Abdul Aziz',
-    createdAt: '2026-01-18',
-    lastActivity: '2 days ago'
-  },
-  { 
-    id: '5',
-    leadNumber: 'LEAD-2026-0005',
-    organization: 'Narayana Health',
-    contact: 'Vikram Singh',
-    email: 'v.singh@narayana.com',
-    phone: '+91 98765 43214',
-    status: 'negotiation',
-    source: 'Cold Outreach',
-    expectedValue: 4500000,
-    probability: 85,
-    serviceInterest: ['Fractional CTO', 'AI Strategy'],
-    assignedTo: 'Sanjeev Malhotra',
-    createdAt: '2026-01-15',
-    lastActivity: '3 hours ago'
-  },
-  { 
-    id: '6',
-    leadNumber: 'LEAD-2026-0006',
-    organization: 'SRL Diagnostics',
-    contact: 'Anita Desai',
-    email: 'anita.d@srl.com',
-    phone: '+91 98765 43215',
-    status: 'won',
-    source: 'LinkedIn',
-    expectedValue: 1800000,
-    probability: 100,
-    serviceInterest: ['AI Chatbots', 'Workflow Automation'],
-    assignedTo: 'Kunal Bellur',
-    createdAt: '2026-01-10',
-    lastActivity: '1 week ago'
-  },
-  { 
-    id: '7',
-    leadNumber: 'LEAD-2026-0007',
-    organization: 'Manipal Hospitals',
-    contact: 'Dr. Ravi Menon',
-    email: 'ravi.m@manipal.edu',
-    phone: '+91 98765 43216',
-    status: 'lost',
-    source: 'Website',
-    expectedValue: 2200000,
-    probability: 0,
-    serviceInterest: ['Voice Agents'],
-    assignedTo: 'Abdul Aziz',
-    createdAt: '2026-01-08',
-    lastActivity: '2 weeks ago'
-  },
-  { 
-    id: '8',
-    leadNumber: 'LEAD-2026-0008',
-    organization: 'Columbia Asia',
-    contact: 'Sarah Chen',
-    email: 'sarah.c@columbiaasia.com',
-    phone: '+91 98765 43217',
-    status: 'new',
-    source: 'WhatsApp',
-    expectedValue: 1200000,
-    probability: 15,
-    serviceInterest: ['AI Integration'],
-    assignedTo: 'Sanjeev Malhotra',
-    createdAt: '2026-01-21',
-    lastActivity: '1 hour ago'
-  },
-]
+import { supabase } from '@/lib/innovation/i2e-db'
 
 const statusOptions = [
   { value: 'all', label: 'All Status' },
@@ -169,12 +39,14 @@ const statusOptions = [
 
 const sourceOptions = [
   { value: 'all', label: 'All Sources' },
-  { value: 'Website', label: 'Website' },
-  { value: 'LinkedIn', label: 'LinkedIn' },
-  { value: 'Referral', label: 'Referral' },
-  { value: 'Voice Agent', label: 'Voice Agent' },
-  { value: 'WhatsApp', label: 'WhatsApp' },
-  { value: 'Cold Outreach', label: 'Cold Outreach' },
+  { value: 'website', label: 'Website' },
+  { value: 'linkedin', label: 'LinkedIn' },
+  { value: 'referral', label: 'Referral' },
+  { value: 'voice_agent', label: 'Voice Agent' },
+  { value: 'voice_call', label: 'Voice Call' },
+  { value: 'ai_assessment', label: 'AI Assessment' },
+  { value: 'whatsapp', label: 'WhatsApp' },
+  { value: 'cold_outreach', label: 'Cold Outreach' },
 ]
 
 const statusColors: Record<string, string> = {
@@ -197,14 +69,71 @@ const formatCurrency = (value: number) => {
 }
 
 export default function LeadsPage() {
+  const searchParams = useSearchParams()
+  const sourceFromUrl = searchParams.get('source') || 'all'
+
+  const [leads, setLeads] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [sourceFilter, setSourceFilter] = useState('all')
+  const [sourceFilter, setSourceFilter] = useState(sourceFromUrl)
   const [showNewLeadModal, setShowNewLeadModal] = useState(false)
   const [selectedLeads, setSelectedLeads] = useState<string[]>([])
 
+  // Update source filter when URL param changes
+  useEffect(() => {
+    setSourceFilter(sourceFromUrl)
+  }, [sourceFromUrl])
+
+  // Load leads from Supabase
+  useEffect(() => {
+    loadLeads()
+  }, [])
+
+  const loadLeads = async () => {
+    setIsLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('leads')
+        .select(`
+          *,
+          contact:contact_id(name, email, phone),
+          organization:organization_id(name, industry)
+        `)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+
+      // Format data to match component structure
+      const formattedLeads = (data || []).map((lead: any) => ({
+        id: lead.id,
+        leadNumber: lead.lead_number,
+        organization: lead.organization?.name || 'Unknown',
+        contact: lead.contact?.name || 'Unknown',
+        email: lead.contact?.email || '',
+        phone: lead.contact?.phone || '',
+        status: lead.status,
+        source: lead.source,
+        expectedValue: 0, // Can be added to DB later
+        probability: lead.score || 0,
+        serviceInterest: [],
+        assignedTo: 'Unassigned', // Can be added to DB later
+        createdAt: new Date(lead.created_at).toLocaleDateString(),
+        lastActivity: 'Recently'
+      }))
+
+      setLeads(formattedLeads)
+    } catch (error) {
+      console.error('Error loading leads:', error)
+      // Fallback to empty array on error
+      setLeads([])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   // Filter leads
-  const filteredLeads = allLeads.filter(lead => {
+  const filteredLeads = leads.filter(lead => {
     const matchesSearch = 
       lead.organization.toLowerCase().includes(searchQuery.toLowerCase()) ||
       lead.contact.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -231,6 +160,17 @@ export default function LeadsPage() {
     } else {
       setSelectedLeads([...selectedLeads, id])
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[hsl(var(--bg-primary))] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-[hsl(var(--accent-primary))] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[hsl(var(--foreground-muted))]">Loading leads...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

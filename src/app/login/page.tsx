@@ -55,14 +55,13 @@ export default function TeamLoginPage() {
           return
         }
 
-        // Check if user is a team member (not a client)
-        const teamRoles = ['super_admin', 'admin', 'team_member']
-        if (!teamRoles.includes(profile.role)) {
-          setError('Access denied. This login is for team members only.')
-          await supabase.auth.signOut()
-          setIsLoading(false)
-          return
-        }
+// Check if user is a team member (not a client)
+if (profile.role === 'client') {
+  setError('Access denied. This login is for team members only.')
+  await supabase.auth.signOut()
+  setIsLoading(false)
+  return
+}
 
         // Redirect to CRM dashboard
         router.push('/crm')
