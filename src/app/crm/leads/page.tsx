@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { 
@@ -67,18 +67,8 @@ const formatCurrency = (value: number) => {
   }
   return `₹${value.toLocaleString()}`
 }
-import { Suspense } from 'react'
-function LeadsPageContent() {
-  // Keep everything exactly as is
-}
 
-export default function LeadsPage() {
-  return (
-    <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
-      <LeadsPageContent />
-    </Suspense>
-  )
-}
+function LeadsPageContent() {
   const searchParams = useSearchParams()
   const sourceFromUrl = searchParams.get('source') || 'all'
 
@@ -621,5 +611,20 @@ export default function LeadsPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function LeadsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[hsl(var(--bg-primary))] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-[hsl(var(--accent-primary))] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[hsl(var(--foreground-muted))]">Loading...</p>
+        </div>
+      </div>
+    }>
+      <LeadsPageContent />
+    </Suspense>
   )
 }
