@@ -177,24 +177,63 @@ export default function FeasibilityPanel({ ideaId, currentStage, existingAnalysi
                   </div>
                 )}
 
-                {/* Risks */}
-                {analysis.risks && (
-                  <div>
-                    <button onClick={() => toggleSection('risks')} className="w-full flex items-center justify-between p-3 bg-red-500/10 rounded-lg hover:bg-red-500/20 transition-colors border border-red-500/30">
-                      <div className="flex items-center gap-2"><Shield className="w-5 h-5 text-red-400" /><span className="text-red-400 font-medium">Risk Assessment</span></div>
-                      {expandedSections.risks ? <ChevronUp className="w-5 h-5 text-red-400" /> : <ChevronDown className="w-5 h-5 text-red-400" />}
-                    </button>
-                    <AnimatePresence>{expandedSections.risks && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                        <div className="mt-3 space-y-4">
-                          {[{ label: 'Technical Risks', risks: analysis.risks.technical || [] },{ label: 'Market Risks', risks: analysis.risks.market || [] },{ label: 'Execution Risks', risks: analysis.risks.execution || [] }].map((cat, i) => cat.risks.length > 0 && (
-                            <div key={i}><h4 className="text-white font-medium mb-2">{cat.label}</h4><div className="space-y-2">{cat.risks.map((r, j) => (<div key={j} className={`bg-[#0d0d0d] rounded-lg p-3 border ${getRiskColor(r.probability, r.impact)}`}><div className="flex items-center justify-between mb-1"><span className="text-white text-sm">{r.risk}</span><div className="flex gap-2"><span className={`text-xs px-2 py-0.5 rounded ${r.probability === 'high' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>P: {r.probability}</span><span className={`text-xs px-2 py-0.5 rounded ${r.impact === 'high' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>I: {r.impact}</span></div></div><p className="text-xs text-gray-400">Mitigation: {r.mitigation}</p></div>))}</div></div>
-                          ))}
+{/* Risks */}
+{analysis.risks && (
+  <div>
+    <button onClick={() => toggleSection('risks')} className="w-full flex items-center justify-between p-3 bg-red-500/10 rounded-lg hover:bg-red-500/20 transition-colors border border-red-500/30">    
+      <div className="flex items-center gap-2"><Shield className="w-5 h-5 text-red-400" /><span className="text-red-400 font-medium">Risk Assessment</span></div>
+      {expandedSections.risks ? <ChevronUp className="w-5 h-5 text-red-400" /> : <ChevronDown className="w-5 h-5 text-red-400" />}
+    </button>
+    <AnimatePresence>{expandedSections.risks && (
+      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+        <div className="mt-3 space-y-4">
+          {[
+            { label: 'Technical Risks', risks: analysis.risks.technical || [], color: 'red' },
+            { label: 'Market Risks', risks: analysis.risks.market || [], color: 'orange' },
+            { label: 'Execution Risks', risks: analysis.risks.execution || [], color: 'yellow' }
+          ].map((cat, i) => cat.risks.length > 0 && (
+            <div key={i}>
+              <h4 className="text-white font-medium mb-2">{cat.label}</h4>
+              <div className="space-y-2">
+                {cat.risks.map((r: any, j: number) => {
+                  // Handle both string format and object format
+                  const isString = typeof r === 'string';
+                  const riskText = isString ? r : (r.risk || r.description || 'Unknown risk');
+                  const probability = isString ? 'medium' : (r.probability || 'medium');
+                  const impact = isString ? 'medium' : (r.impact || 'medium');
+                  const mitigation = isString ? null : r.mitigation;
+                  
+                  return (
+                    <div key={j} className={`bg-[#0d0d0d] rounded-lg p-3 border ${
+                      cat.color === 'red' ? 'border-red-500/30' : 
+                      cat.color === 'orange' ? 'border-orange-500/30' : 
+                      'border-yellow-500/30'
+                    }`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="text-white text-sm flex-1">{riskText}</span>
+                        <div className="flex gap-2 shrink-0">
+                          <span className={`text-xs px-2 py-0.5 rounded ${probability === 'high' ? 'bg-red-500/20 text-red-400' : probability === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-green-500/20 text-green-400'}`}>
+                            P: {probability}
+                          </span>
+                          <span className={`text-xs px-2 py-0.5 rounded ${impact === 'high' ? 'bg-red-500/20 text-red-400' : impact === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-green-500/20 text-green-400'}`}>
+                            I: {impact}
+                          </span>
                         </div>
-                      </motion.div>
-                    )}</AnimatePresence>
-                  </div>
-                )}
+                      </div>
+                      {mitigation && (
+                        <p className="text-xs text-gray-400 mt-2">Mitigation: {mitigation}</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    )}</AnimatePresence>
+  </div>
+)}
 
                 {/* Resources */}
                 {analysis.resource_requirements && (
@@ -214,20 +253,40 @@ export default function FeasibilityPanel({ ideaId, currentStage, existingAnalysi
                   </div>
                 )}
 
-                {/* Funding */}
-                {analysis.funding_options?.length > 0 && (
-                  <div>
-                    <button onClick={() => toggleSection('funding')} className="w-full flex items-center justify-between p-3 bg-emerald-500/10 rounded-lg hover:bg-emerald-500/20 transition-colors border border-emerald-500/30">
-                      <div className="flex items-center gap-2"><DollarSign className="w-5 h-5 text-emerald-400" /><span className="text-emerald-400 font-medium">Funding Options ({analysis.funding_options.length})</span></div>
-                      {expandedSections.funding ? <ChevronUp className="w-5 h-5 text-emerald-400" /> : <ChevronDown className="w-5 h-5 text-emerald-400" />}
-                    </button>
-                    <AnimatePresence>{expandedSections.funding && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                        <div className="mt-3 space-y-2">{analysis.funding_options.map((f, i) => (<div key={i} className={`bg-[#0d0d0d] rounded-lg p-3 border ${getViabilityColor(f.viability)}`}><div className="flex items-center justify-between mb-1"><span className="text-white font-medium">{f.option}</span><span className={`text-xs px-2 py-1 rounded-full border ${getViabilityColor(f.viability)}`}>{f.viability.toUpperCase()}</span></div><p className="text-sm text-gray-400">{f.description}</p></div>))}</div>
-                      </motion.div>
-                    )}</AnimatePresence>
-                  </div>
-                )}
+{/* Funding */}
+{analysis.funding_options && Array.isArray(analysis.funding_options) && analysis.funding_options.length > 0 && (
+  <div>
+    <button onClick={() => toggleSection('funding')} className="w-full flex items-center justify-between p-3 bg-emerald-500/10 rounded-lg hover:bg-emerald-500/20 transition-colors border border-emerald-500/30">
+      <div className="flex items-center gap-2"><DollarSign className="w-5 h-5 text-emerald-400" /><span className="text-emerald-400 font-medium">Funding Options ({analysis.funding_options.length})</span></div>
+      {expandedSections.funding ? <ChevronUp className="w-5 h-5 text-emerald-400" /> : <ChevronDown className="w-5 h-5 text-emerald-400" />}
+    </button>
+    <AnimatePresence>{expandedSections.funding && (
+      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+        <div className="mt-3 space-y-2">
+          {analysis.funding_options.map((f: any, i: number) => {
+            if (!f) return null;
+            
+            // Handle both string format and object format
+            const isString = typeof f === 'string';
+            const optionName = isString ? f : (f.option || f.name || 'Funding Option');
+            const viability = isString ? 'medium' : (f.viability || 'medium');
+            const description = isString ? `Potential funding source for this project` : (f.description || 'No description available');
+            
+            return (
+              <div key={i} className={`bg-[#0d0d0d] rounded-lg p-3 border ${getViabilityColor(viability)}`}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-white font-medium">{optionName}</span>
+                  <span className={`text-xs px-2 py-1 rounded-full border ${getViabilityColor(viability)}`}>{viability.toUpperCase()}</span>
+                </div>
+                <p className="text-sm text-gray-400">{description}</p>
+              </div>
+            );
+          })}
+        </div>
+      </motion.div>
+    )}</AnimatePresence>
+  </div>
+)}
 
                 <div className="text-center text-gray-500 text-sm pt-4 border-t border-[#2a2a2a]">Analysis completed on {new Date(analysis.created_at).toLocaleString()}</div>
               </div>

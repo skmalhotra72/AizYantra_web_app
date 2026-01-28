@@ -235,7 +235,10 @@ Respond ONLY with valid JSON in this exact format:
       marketData.recommendation = 'decline'
     }
 
-    // Save to database
+// Save to database
+    // For market sizing, use a confidence score based on gate pass (TAM is stored in result_data)
+    const marketConfidenceScore = marketData.gate_passed ? 75 : 40
+
     const { data: savedAnalysis, error: saveError } = await supabase
       .from('ai_evaluations')
       .insert({
@@ -243,7 +246,7 @@ Respond ONLY with valid JSON in this exact format:
         stage_number: 3,
         evaluation_type: 'market_sizing',
         model_used: `perplexity-${PERPLEXITY_MODEL}`,
-        confidence_score: tamValue, // Store TAM as reference
+        confidence_score: marketConfidenceScore,
         pass_fail: marketData.gate_passed ? 'pass' : 'fail',
         strengths: marketData.market_drivers,
         concerns: marketData.market_barriers,

@@ -8,6 +8,7 @@ import {
   Lightbulb, 
   Users, 
   Target, 
+  Clock,
   Loader2,
   CheckCircle2,
   XCircle,
@@ -28,6 +29,7 @@ export default function NewIdeaPage() {
     problem: '',
     target_audience: '',
     proposed_solution: '',
+    why_now: '',
     expected_impact: '',
     notes: ''
   })
@@ -287,14 +289,14 @@ export default function NewIdeaPage() {
                 <Users className="w-4 h-4" />
                 Who is this for? *
               </label>
-              <input
-                type="text"
+              <textarea
                 name="target_audience"
                 value={formData.target_audience}
                 onChange={handleChange}
-                placeholder="e.g., Healthcare providers, SMBs in retail, etc."
+                placeholder="Describe your target users:&#10;• Demographics (age, role, industry)&#10;• Company size and type&#10;• Specific pain points they experience"
                 required
-                className="w-full px-4 py-3 bg-[hsl(var(--bg-secondary))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--foreground-subtle))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent-primary))] transition-all"
+                rows={3}
+                className="w-full px-4 py-3 bg-[hsl(var(--bg-secondary))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--foreground-subtle))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent-primary))] transition-all resize-none"
               />
             </div>
 
@@ -310,6 +312,21 @@ export default function NewIdeaPage() {
                 onChange={handleChange}
                 placeholder="How do you envision solving this problem?"
                 rows={4}
+                className="w-full px-4 py-3 bg-[hsl(var(--bg-secondary))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--foreground-subtle))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent-primary))] transition-all resize-none"
+              />
+            </div>
+            {/* Why Now? - Timing & Urgency */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-[hsl(var(--foreground))] mb-2">
+                <Clock className="w-4 h-4" />
+                Why Now? (Optional)
+              </label>
+              <textarea
+                name="why_now"
+                value={formData.why_now}
+                onChange={handleChange}
+                placeholder="Why is now the right time for this idea?&#10;• Market trends making this timely&#10;• Technology enablers that didn't exist before&#10;• Competitive window of opportunity"
+                rows={3}
                 className="w-full px-4 py-3 bg-[hsl(var(--bg-secondary))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--foreground-subtle))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent-primary))] transition-all resize-none"
               />
             </div>

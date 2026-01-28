@@ -179,7 +179,10 @@ Be rigorous but constructive. If declining, provide specific pivot suggestions t
       evaluation.advance_recommendation = 'decline'
     }
 
-    // Save to database
+// Save to database
+    // Normalize confidence_score to 0-100 scale (original is out of 500)
+    const normalizedScore = Math.round((calculatedScore / 500) * 100)
+
     const { data: savedEval, error: saveError } = await supabase
       .from('ai_evaluations')
       .insert({
@@ -187,7 +190,7 @@ Be rigorous but constructive. If declining, provide specific pivot suggestions t
         stage_number: 2,
         evaluation_type: 'ai_evaluation',
         model_used: MODEL,
-        confidence_score: calculatedScore,
+        confidence_score: normalizedScore,
         pass_fail: evaluation.gate_passed ? 'pass' : 'fail',
         strengths: evaluation.strengths,
         concerns: evaluation.concerns,
@@ -203,6 +206,7 @@ Be rigorous but constructive. If declining, provide specific pivot suggestions t
       })
       .select()
       .single()
+     
 
     if (saveError) {
       console.error('Failed to save evaluation:', saveError)

@@ -23,6 +23,7 @@ import MarketSizingPanel from '@/components/innovation/MarketSizingPanel'
 import ImpactAssessmentPanel from '@/components/innovation/ImpactAssessmentPanel'
 import FeasibilityPanel from '@/components/innovation/FeasibilityPanel'
 import PitchDeckPanel from '@/components/innovation/PitchDeckPanel'
+import VotingPanel from '@/components/innovation/VotingPanel'
 
 // Type for AI Evaluation from database
 interface AIEvaluation {
@@ -76,30 +77,30 @@ export default function IdeaDetailPage() {
 
   const loadIdea = async () => {
     setIsLoading(true)
-    
+
     addDebug(`Loading idea: ${ideaId}`)
-    
+
     const ideaData = await getIdeaById(ideaId)
-    
+
     if (ideaData) {
       addDebug(`Idea loaded: ${ideaData.title}, Stage: ${ideaData.current_stage}`)
       setIdea(ideaData)
       const stageData = await getStageByNumber(ideaData.current_stage)
       setStage(stageData)
-      
+
       // Load evaluations - try API first, then direct Supabase
       await loadAllEvaluations(ideaId)
     } else {
       addDebug('ERROR: Idea not found!')
     }
-    
+
     setIsLoading(false)
   }
 
-  // Load evaluations - try API route first (server-side bypasses RLS), then fall back to direct query
+  // Load evaluations - try API route first (server-side bypasses RLS), then fall back to direct query      
   const loadAllEvaluations = async (ideaId: string) => {
     addDebug('Searching for evaluation data...')
-    
+
     // Method 1: Try API route first (server-side, proper auth - bypasses RLS)
     try {
       const response = await fetch(`/api/innovation/get-evaluations?ideaId=${ideaId}`)
@@ -115,7 +116,7 @@ export default function IdeaDetailPage() {
     } catch (error) {
       addDebug(`API route error: ${error}, trying direct query...`)
     }
-    
+
     // Method 2: Direct Supabase query (may be blocked by RLS)
     await loadEvaluationsDirectFromSupabase(ideaId)
   }
@@ -128,12 +129,12 @@ export default function IdeaDetailPage() {
       const rd = e.result_data || {}
       setEvaluation({
         id: e.id,
-        scores: rd.scores || { 
-          problem_clarity: 0, 
-          market_need: 0, 
-          target_audience: 0, 
-          urgency_timing: 0, 
-          differentiation: 0 
+        scores: rd.scores || {
+          problem_clarity: 0,
+          market_need: 0,
+          target_audience: 0,
+          urgency_timing: 0,
+          differentiation: 0
         },
         composite_score: rd.composite_score || e.confidence_score || 0,
         gate_passed: e.pass_fail === 'pass',
@@ -147,7 +148,7 @@ export default function IdeaDetailPage() {
       })
       addDebug('Stage 2 (AI Evaluation) loaded from API')
     }
-    
+
     // Stage 3: Market Sizing
     if (evals[3]) {
       const e = evals[3]
@@ -171,7 +172,7 @@ export default function IdeaDetailPage() {
       })
       addDebug('Stage 3 (Market Sizing) loaded from API')
     }
-    
+
     // Stage 4: Impact Assessment
     if (evals[4]) {
       const e = evals[4]
@@ -191,7 +192,7 @@ export default function IdeaDetailPage() {
       })
       addDebug('Stage 4 (Impact Assessment) loaded from API')
     }
-    
+
     // Stage 5: Feasibility
     if (evals[5]) {
       const e = evals[5]
@@ -213,7 +214,7 @@ export default function IdeaDetailPage() {
       })
       addDebug('Stage 5 (Feasibility) loaded from API')
     }
-    
+
     // Stage 6: Pitch Deck
     if (evals[6]) {
       const e = evals[6]
@@ -236,14 +237,14 @@ export default function IdeaDetailPage() {
   // Direct Supabase query (fallback if API route doesn't exist)
   const loadEvaluationsDirectFromSupabase = async (ideaId: string) => {
     const supabase = createClient()
-    
+
     // Try ai_evaluations table
     try {
       const { data: aiEvalData, error: aiEvalError } = await supabase
         .from('ai_evaluations')
         .select('*')
         .eq('idea_id', ideaId)
-      
+
       if (aiEvalError) {
         addDebug(`ai_evaluations table error: ${aiEvalError.message}`)
       } else {
@@ -257,14 +258,14 @@ export default function IdeaDetailPage() {
     } catch (e) {
       addDebug(`ai_evaluations catch error: ${e}`)
     }
-    
+
     // Try innovation_evaluations table
     try {
       const { data: innovEvalData, error: innovEvalError } = await supabase
         .from('innovation_evaluations')
         .select('*')
         .eq('idea_id', ideaId)
-      
+
       if (innovEvalError) {
         addDebug(`innovation_evaluations table error: ${innovEvalError.message}`)
       } else {
@@ -278,14 +279,14 @@ export default function IdeaDetailPage() {
     } catch (e) {
       addDebug(`innovation_evaluations catch error: ${e}`)
     }
-    
+
     // Try idea_evaluations table
     try {
       const { data: ideaEvalData, error: ideaEvalError } = await supabase
         .from('idea_evaluations')
         .select('*')
         .eq('idea_id', ideaId)
-      
+
       if (ideaEvalError) {
         addDebug(`idea_evaluations table error: ${ideaEvalError.message}`)
       } else {
@@ -299,14 +300,14 @@ export default function IdeaDetailPage() {
     } catch (e) {
       addDebug(`idea_evaluations catch error: ${e}`)
     }
-    
+
     // Try evaluations table (generic name)
     try {
       const { data: evalData, error: evalError } = await supabase
         .from('evaluations')
         .select('*')
         .eq('idea_id', ideaId)
-      
+
       if (evalError) {
         addDebug(`evaluations table error: ${evalError.message}`)
       } else {
@@ -320,7 +321,7 @@ export default function IdeaDetailPage() {
     } catch (e) {
       addDebug(`evaluations catch error: ${e}`)
     }
-    
+
     // Check if data is embedded in the ideas table itself
     try {
       const { data: ideaWithEmbedded, error: ideaError } = await supabase
@@ -332,15 +333,15 @@ export default function IdeaDetailPage() {
       if (ideaWithEmbedded) {
         addDebug(`Checking ideas table for embedded data...`)
         console.log('Full idea record:', ideaWithEmbedded)
-        
+
         // Check for embedded evaluation fields
         if (ideaWithEmbedded.ai_evaluation || ideaWithEmbedded.evaluation_data || ideaWithEmbedded.metadata) {
           addDebug('Found embedded evaluation data in ideas table!')
-          
-          const embedded = ideaWithEmbedded.ai_evaluation || 
-                          ideaWithEmbedded.evaluation_data || 
+
+          const embedded = ideaWithEmbedded.ai_evaluation ||
+                          ideaWithEmbedded.evaluation_data ||
                           ideaWithEmbedded.metadata?.evaluations
-          
+
           if (embedded) {
             console.log('Embedded data:', embedded)
             processEmbeddedData(embedded, ideaWithEmbedded.metadata)
@@ -351,7 +352,7 @@ export default function IdeaDetailPage() {
     } catch (e) {
       addDebug(`ideas embed check error: ${e}`)
     }
-    
+
     addDebug('NO EVALUATION DATA FOUND IN ANY TABLE!')
     addDebug('This idea may need to be re-evaluated.')
   }
@@ -361,11 +362,11 @@ export default function IdeaDetailPage() {
     for (const record of data) {
       const stageNum = record.stage_number || record.stage || record.evaluation_stage
       const resultData = record.result_data || record.result || record.data || record
-      
+
       addDebug(`Processing stage ${stageNum} data`)
       console.log(`Stage ${stageNum} raw:`, record)
       console.log(`Stage ${stageNum} result:`, resultData)
-      
+
       switch (stageNum) {
         case 2:
           setEvaluation(extractEvaluationData(record, resultData))
@@ -535,6 +536,11 @@ export default function IdeaDetailPage() {
     loadIdea()
   }
 
+  const handleVotingComplete = (decision: string) => {
+    console.log('Voting complete, decision:', decision)
+    loadIdea()
+  }
+
   const getStatusColor = (status: string) => {
     const colors = {
       active: 'bg-sky-500/10 text-sky-500 border-sky-500/20',
@@ -542,6 +548,8 @@ export default function IdeaDetailPage() {
       declined: 'bg-red-500/10 text-red-500 border-red-500/20',
       on_hold: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
       completed: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
+      voting: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+      conditional: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
     }
     return colors[status as keyof typeof colors] || colors.active
   }
@@ -550,7 +558,7 @@ export default function IdeaDetailPage() {
     return (
       <div className="min-h-screen bg-[hsl(var(--bg-primary))] flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-[hsl(var(--accent-primary))] animate-spin mx-auto mb-4" />
+          <Loader2 className="w-12 h-12 text-[hsl(var(--accent-primary))] animate-spin mx-auto mb-4" />     
           <p className="text-[hsl(var(--foreground-muted))]">Loading idea...</p>
         </div>
       </div>
@@ -720,7 +728,7 @@ export default function IdeaDetailPage() {
                   Proposed Solution
                 </h2>
               </div>
-              <p className="text-[hsl(var(--foreground-muted))] leading-relaxed whitespace-pre-wrap">
+              <p className="text-[hsl(var(--foreground-muted))] leading-relaxed whitespace-pre-wrap">       
                 {idea.proposed_solution}
               </p>
             </motion.div>
@@ -823,11 +831,26 @@ export default function IdeaDetailPage() {
             </motion.div>
           )}
 
+          {/* Voting Panel - Stage 7 */}
+          {(idea.current_stage >= 6 || idea.status === 'voting') && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.0 }}
+            >
+              <VotingPanel
+                ideaId={ideaId}
+                currentStage={idea.current_stage}
+                onVotingComplete={handleVotingComplete}
+              />
+            </motion.div>
+          )}
+
           {/* Actions */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.0 }}
+            transition={{ delay: 1.1 }}
             className="flex items-center gap-3 pt-4"
           >
             <button
@@ -836,10 +859,10 @@ export default function IdeaDetailPage() {
             >
               Back to Dashboard
             </button>
-            
+
             {/* Edit button - show when idea needs improvement at any stage */}
             {(
-              idea.current_stage === 1 || 
+              idea.current_stage === 1 ||
               (evaluation && !evaluation.gate_passed) ||
               (marketSizing && !marketSizing.gate_passed) ||
               (impactAssessment && !impactAssessment.gate_passed) ||
