@@ -1,5 +1,8 @@
+export const dynamic = 'force-dynamic'
+
 'use client'
 
+import { Suspense } from 'react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -18,7 +21,8 @@ import {
   Loader2
 } from 'lucide-react'
 
-export default function PortalSignupPage() {
+// Inner component with all functionality
+function SignupContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const intent = searchParams.get('intent') // 'i2e-evaluation' or null
@@ -543,5 +547,21 @@ export default function PortalSignupPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// Wrapper with Suspense - THIS IS THE ONLY CHANGE!
+export default function PortalSignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-teal-400 animate-spin mx-auto mb-4" />
+          <p className="text-slate-400">Loading signup form...</p>
+        </div>
+      </div>
+    }>
+      <SignupContent />
+    </Suspense>
   )
 }
