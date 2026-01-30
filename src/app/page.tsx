@@ -12,9 +12,6 @@ export default function Home() {
       {/* Hero Section - Globe + Expandable Tags */}
       <HeroYantra />
       
-      {/* POC Program Banner */}
-      <POCBanner />
-      
       {/* AI Assessment Banner - NEW! */}
       <AIAssessmentBanner />
       
@@ -29,6 +26,9 @@ export default function Home() {
       
       {/* Final CTA */}
       <FinalCTASection />
+      
+      {/* POC Program Banner - MOVED HERE! */}
+      <POCBanner />
     </main>
   );
 }
