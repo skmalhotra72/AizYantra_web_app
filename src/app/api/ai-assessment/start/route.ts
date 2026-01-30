@@ -4,24 +4,12 @@ import { createClient } from '@/lib/supabase/server'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    
-    const { 
-      email, 
-      fullName, 
-      companyName,
-      role,
-      companySize,
-      industry,
-      phone,
-      revenue
-    } = body
+    const { email, fullName, phone, companyName, role, companySize, industry, revenue } = body
 
-    console.log('Assessment start request:', { email, fullName, companyName, phone })
-
-    // Validate required fields (matching NOT NULL columns)
+    // Validate required fields
     if (!email || !fullName || !companyName) {
       return NextResponse.json(
-        { error: 'Missing required fields: email, fullName, and companyName are required' },
+        { error: 'Missing required fields' },
         { status: 400 }
       )
     }
@@ -32,9 +20,8 @@ export async function POST(request: Request) {
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     
     if (authError || !user) {
-      console.log('Auth error or no user:', authError)
       return NextResponse.json(
-        { error: 'Authentication required. Please log in first.' },
+        { error: 'Authentication required' },
         { status: 401 }
       )
     }
@@ -44,20 +31,18 @@ export async function POST(request: Request) {
       user_id: user.id,
       email: email,
       full_name: fullName,
+      phone: phone || null,
       company_name: companyName,
       role: role || null,
-      company_size: companySize || null,
-      industry: industry || null,
-      phone: phone || null,
+      company_size: companySize,
+      industry: industry,
       annual_revenue: revenue || null,
       status: 'in_progress',
       current_stage: 1,
       started_at: new Date().toISOString(),
-      last_activity_at: new Date().toISOString(),
     }
 
-    console.log('Inserting assessment data:', assessmentData)
-
+    // Insert into assessments table
     const { data: assessment, error: insertError } = await supabase
       .from('ai_assessments')
       .insert(assessmentData)
@@ -67,18 +52,15 @@ export async function POST(request: Request) {
     if (insertError) {
       console.error('Assessment insert error:', insertError)
       return NextResponse.json(
-        { error: 'Failed to create assessment', details: insertError.message },
+        { error: 'Failed to create assessment' },
         { status: 500 }
       )
     }
 
-    console.log('Assessment created successfully:', assessment.id)
-
     return NextResponse.json({
       success: true,
       assessmentId: assessment.id,
-      message: 'Assessment started successfully',
-      redirectUrl: `/ai-assessment/stage/1?id=${assessment.id}`
+      message: 'Assessment started successfully'
     })
 
   } catch (error: any) {
