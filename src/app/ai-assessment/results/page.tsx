@@ -1059,7 +1059,7 @@ function ResultsContent() {
                 Schedule Free Consultation
               </Link>
               <a
-                href="tel:+919876543210"
+                href="tel:+919958824555"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 border border-white/20 rounded-xl font-semibold hover:bg-white/20 transition-colors"
               >
                 <Phone className="w-5 h-5" />

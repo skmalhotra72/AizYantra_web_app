@@ -503,9 +503,11 @@ async function generatePDF(assessment: any, responses: any[]): Promise<Uint8Arra
   doc.setTextColor(...colors.muted)
   doc.text('🌐  www.aizyantra.com', margin, yPos)
   yPos += 8
-  doc.text('📧  hello@aizyantra.com', margin, yPos)
+  doc.text('📧  support@aizyantra.com', margin, yPos)
   yPos += 8
-  doc.text('📞  +91 99999 99999', margin, yPos)
+  doc.text('📞  +91-9958824555', margin, yPos)
+  yPos += 8
+  doc.text('📍  Bengaluru | Gurugram | Mumbai | Sydney', margin, yPos)
   yPos += 20
 
   // Footer

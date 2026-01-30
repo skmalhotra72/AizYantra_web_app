@@ -1,274 +1,393 @@
 'use client'
 
 import { useState } from 'react'
-import { Mail, Phone, MapPin, Send, Linkedin, Twitter, Clock, CheckCircle2, ArrowRight } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { 
+  Mail, Phone, MapPin, Clock, Send, Loader2, CheckCircle,
+  Building2, Globe, MessageSquare, Calendar, ArrowRight
+} from 'lucide-react'
 
 export default function ContactPage() {
-  const [formState, setFormState] = useState({
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
-    company: '',
     phone: '',
-    service: '',
-    message: ''
+    company: '',
+    message: '',
+    interest: 'general'
   })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    setSubmitStatus('success')
-    setIsSubmitting(false)
-    setFormState({
-      name: '',
-      email: '',
-      company: '',
-      phone: '',
-      service: '',
-      message: ''
-    })
+    setSubmitting(true)
+    setError('')
+
+    try {
+      // Simulate form submission - replace with actual API call
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setSubmitted(true)
+    } catch (err) {
+      setError('Failed to submit. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormState(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }))
-  }
-
-  const services = [
-    'AI Strategy & Consulting',
-    'Voice Agents',
-    'AI Chatbots',
-    'Workflow Automation',
-    'Custom AI Development',
-    'Fractional CTO',
-    'Other'
+  const offices = [
+    { 
+      city: 'Bengaluru', 
+      state: 'Karnataka',
+      country: 'India',
+      type: 'Tech Hub'
+    },
+    { 
+      city: 'Gurugram', 
+      state: 'Haryana',
+      country: 'India',
+      type: 'North India HQ'
+    },
+    { 
+      city: 'Mumbai', 
+      state: 'Maharashtra',
+      country: 'India',
+      type: 'West India'
+    },
+    { 
+      city: 'Sydney', 
+      state: 'NSW',
+      country: 'Australia',
+      type: 'APAC Office'
+    },
   ]
 
+  const interests = [
+    { value: 'general', label: 'General Inquiry' },
+    { value: 'chatbot', label: 'AI Chatbot Solutions' },
+    { value: 'automation', label: 'Process Automation' },
+    { value: 'analytics', label: 'AI Analytics' },
+    { value: 'voice', label: 'Voice AI' },
+    { value: 'partnership', label: 'Partnership' },
+  ]
+
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-[hsl(var(--bg-primary))] flex items-center justify-center px-6">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center max-w-md"
+        >
+          <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="w-10 h-10 text-green-500" />
+          </div>
+          <h1 className="text-3xl font-bold text-[hsl(var(--foreground))] mb-4">
+            Message Sent!
+          </h1>
+          <p className="text-[hsl(var(--foreground-muted))] mb-8">
+            Thank you for reaching out. Our team will get back to you within 24 hours.
+          </p>
+          <a 
+            href="/"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#FF6B35] text-white rounded-xl font-semibold hover:bg-[#FF6B35]/90 transition-colors"
+          >
+            Back to Home
+            <ArrowRight className="w-4 h-4" />
+          </a>
+        </motion.div>
+      </div>
+    )
+  }
+
   return (
-    <main className="min-h-screen bg-[hsl(var(--background))]">
+    <div className="min-h-screen bg-[hsl(var(--bg-primary))]">
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[hsl(var(--surface-raised))] border border-[hsl(var(--border))] rounded-full mb-6">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              <span className="text-xs font-mono text-[hsl(var(--foreground-muted))]">Response time: ~2 hours</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[hsl(var(--foreground))] mb-6">
-              {"Let's Build Something "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--accent))]">Intelligent</span>
+        <div className="max-w-6xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-[#FF6B35]/10 text-[#FF6B35] rounded-full text-sm font-medium mb-6">
+              <MessageSquare className="w-4 h-4" />
+              Get in Touch
+            </span>
+            <h1 className="text-4xl md:text-5xl font-bold text-[hsl(var(--foreground))] mb-6">
+              Let's Build Something
+              <span className="text-[#FF6B35]"> Amazing Together</span>
             </h1>
-            <p className="text-lg text-[hsl(var(--foreground-muted))] leading-relaxed">
-              Ready to transform your business with AI? Share your challenge, and we will show you what is possible. No fluff, just practical solutions.
+            <p className="text-xl text-[hsl(var(--foreground-muted))] max-w-2xl mx-auto">
+              Ready to transform your business with AI? Our team of experts is here to help you every step of the way.
             </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Contact Cards */}
+      <section className="pb-8 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Email Card */}
+            <motion.a
+              href="mailto:support@aizyantra.com"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="group p-6 bg-[hsl(var(--bg-secondary))] border border-[hsl(var(--border))] rounded-2xl hover:border-[#FF6B35]/50 transition-all"
+            >
+              <div className="w-12 h-12 rounded-xl bg-[#FF6B35]/10 flex items-center justify-center mb-4 group-hover:bg-[#FF6B35]/20 transition-colors">
+                <Mail className="w-6 h-6 text-[#FF6B35]" />
+              </div>
+              <h3 className="font-semibold text-[hsl(var(--foreground))] mb-1">Email Us</h3>
+              <p className="text-[#FF6B35] font-medium">support@aizyantra.com</p>
+              <p className="text-sm text-[hsl(var(--foreground-muted))] mt-2">
+                We respond within 24 hours
+              </p>
+            </motion.a>
+
+            {/* Phone Card */}
+            <motion.a
+              href="tel:+919958824555"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="group p-6 bg-[hsl(var(--bg-secondary))] border border-[hsl(var(--border))] rounded-2xl hover:border-[#FF6B35]/50 transition-all"
+            >
+              <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4 group-hover:bg-blue-500/20 transition-colors">
+                <Phone className="w-6 h-6 text-blue-500" />
+              </div>
+              <h3 className="font-semibold text-[hsl(var(--foreground))] mb-1">Call Us</h3>
+              <p className="text-blue-500 font-medium">+91-9958824555</p>
+              <p className="text-sm text-[hsl(var(--foreground-muted))] mt-2">
+                Mon-Fri, 9am-6pm IST
+              </p>
+            </motion.a>
+
+            {/* Schedule Card */}
+            <motion.a
+              href="/ai-assessment"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="group p-6 bg-[hsl(var(--bg-secondary))] border border-[hsl(var(--border))] rounded-2xl hover:border-[#FF6B35]/50 transition-all"
+            >
+              <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mb-4 group-hover:bg-purple-500/20 transition-colors">
+                <Calendar className="w-6 h-6 text-purple-500" />
+              </div>
+              <h3 className="font-semibold text-[hsl(var(--foreground))] mb-1">Free Assessment</h3>
+              <p className="text-purple-500 font-medium">AI Readiness Check</p>
+              <p className="text-sm text-[hsl(var(--foreground-muted))] mt-2">
+                5-minute assessment
+              </p>
+            </motion.a>
           </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="pb-24 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-5 gap-8">
+      <section className="py-16 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12">
             
             {/* Contact Form */}
-            <div className="lg:col-span-3">
-              <div className="bg-[hsl(var(--surface-raised))] border border-[hsl(var(--border))] rounded-2xl p-8">
-                <h2 className="text-2xl font-semibold text-[hsl(var(--foreground))] mb-6">Send us a message</h2>
-
-                {submitStatus === 'success' ? (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <CheckCircle2 className="w-8 h-8 text-green-500" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-[hsl(var(--foreground))] mb-2">Message Sent!</h3>
-                    <p className="text-[hsl(var(--foreground-muted))] mb-6">We will get back to you within 2 hours during business hours.</p>
-                    <button onClick={() => setSubmitStatus('idle')} className="inline-flex items-center gap-2 text-[hsl(var(--primary))] hover:underline">
-                      Send another message
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">
-                          Full Name <span className="text-[hsl(var(--primary))]">*</span>
-                        </label>
-                        <input type="text" id="name" name="name" required value={formState.name} onChange={handleChange} className="w-full px-4 py-3 bg-[hsl(var(--background))] border border-[hsl(var(--border))] rounded-xl text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--foreground-subtle))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))] focus:border-transparent transition-all" placeholder="John Doe" />
-                      </div>
-                      <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">
-                          Email Address <span className="text-[hsl(var(--primary))]">*</span>
-                        </label>
-                        <input type="email" id="email" name="email" required value={formState.email} onChange={handleChange} className="w-full px-4 py-3 bg-[hsl(var(--background))] border border-[hsl(var(--border))] rounded-xl text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--foreground-subtle))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))] focus:border-transparent transition-all" placeholder="john@company.com" />
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <label htmlFor="company" className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">Company Name</label>
-                        <input type="text" id="company" name="company" value={formState.company} onChange={handleChange} className="w-full px-4 py-3 bg-[hsl(var(--background))] border border-[hsl(var(--border))] rounded-xl text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--foreground-subtle))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))] focus:border-transparent transition-all" placeholder="Acme Inc." />
-                      </div>
-                      <div>
-                        <label htmlFor="phone" className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">Phone Number</label>
-                        <input type="tel" id="phone" name="phone" value={formState.phone} onChange={handleChange} className="w-full px-4 py-3 bg-[hsl(var(--background))] border border-[hsl(var(--border))] rounded-xl text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--foreground-subtle))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))] focus:border-transparent transition-all" placeholder="+91 98765 43210" />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label htmlFor="service" className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">What are you interested in?</label>
-                      <select id="service" name="service" value={formState.service} onChange={handleChange} className="w-full px-4 py-3 bg-[hsl(var(--background))] border border-[hsl(var(--border))] rounded-xl text-[hsl(var(--foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))] focus:border-transparent transition-all appearance-none cursor-pointer">
-                        <option value="">Select a service...</option>
-                        {services.map((service) => (
-                          <option key={service} value={service}>{service}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label htmlFor="message" className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">
-                        Your Message <span className="text-[hsl(var(--primary))]">*</span>
-                      </label>
-                      <textarea id="message" name="message" required rows={5} value={formState.message} onChange={handleChange} className="w-full px-4 py-3 bg-[hsl(var(--background))] border border-[hsl(var(--border))] rounded-xl text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--foreground-subtle))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))] focus:border-transparent transition-all resize-none" placeholder="Tell us about your project or challenge..." />
-                    </div>
-
-                    <button type="submit" disabled={isSubmitting} className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-[hsl(var(--primary))] hover:bg-[hsl(var(--primary-hover))] text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                      {isSubmitting ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Sending...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-5 h-5" />
-                          Send Message
-                        </>
-                      )}
-                    </button>
-                  </form>
-                )}
-              </div>
-            </div>
-
-            {/* Contact Info Sidebar */}
-            <div className="lg:col-span-2 space-y-6">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h2 className="text-2xl font-bold text-[hsl(var(--foreground))] mb-6">
+                Send us a Message
+              </h2>
               
-              {/* Quick Contact Card */}
-              <div className="bg-[hsl(var(--surface-raised))] border border-[hsl(var(--border))] rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-[hsl(var(--foreground))] mb-6">Quick Contact</h3>
-                <div className="space-y-4">
-                  <a href="mailto:sanjeev@aizyantra.com" className="flex items-center gap-4 p-3 bg-[hsl(var(--background))] rounded-xl hover:bg-[hsl(var(--surface))] transition-colors group">
-                    <div className="w-10 h-10 bg-[hsl(var(--primary))]/10 rounded-lg flex items-center justify-center group-hover:bg-[hsl(var(--primary))]/20 transition-colors">
-                      <Mail className="w-5 h-5 text-[hsl(var(--primary))]" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-[hsl(var(--foreground-muted))]">Email</p>
-                      <p className="text-[hsl(var(--foreground))] font-medium">sanjeev@aizyantra.com</p>
-                    </div>
-                  </a>
-
-                  <a href="tel:+919958824555" className="flex items-center gap-4 p-3 bg-[hsl(var(--background))] rounded-xl hover:bg-[hsl(var(--surface))] transition-colors group">
-                    <div className="w-10 h-10 bg-[hsl(var(--accent))]/10 rounded-lg flex items-center justify-center group-hover:bg-[hsl(var(--accent))]/20 transition-colors">
-                      <Phone className="w-5 h-5 text-[hsl(var(--accent))]" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-[hsl(var(--foreground-muted))]">Phone</p>
-                      <p className="text-[hsl(var(--foreground))] font-medium">+91-9958824555</p>
-                    </div>
-                  </a>
-
-                  <div className="flex items-center gap-4 p-3 bg-[hsl(var(--background))] rounded-xl">
-                    <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
-                      <MapPin className="w-5 h-5 text-green-500" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-[hsl(var(--foreground-muted))]">Location</p>
-                      <p className="text-[hsl(var(--foreground))] font-medium">Gurugram, Haryana, India</p>
-                    </div>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      className="w-full px-4 py-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-secondary))] text-[hsl(var(--foreground))] focus:outline-none focus:border-[#FF6B35] transition-colors"
+                      placeholder="John Doe"
+                    />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      className="w-full px-4 py-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-secondary))] text-[hsl(var(--foreground))] focus:outline-none focus:border-[#FF6B35] transition-colors"
+                      placeholder="john@company.com"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      className="w-full px-4 py-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-secondary))] text-[hsl(var(--foreground))] focus:outline-none focus:border-[#FF6B35] transition-colors"
+                      placeholder="+91 98765 43210"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">
+                      Company Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.company}
+                      onChange={(e) => setFormData({...formData, company: e.target.value})}
+                      className="w-full px-4 py-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-secondary))] text-[hsl(var(--foreground))] focus:outline-none focus:border-[#FF6B35] transition-colors"
+                      placeholder="Your Company"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">
+                    I'm interested in
+                  </label>
+                  <select
+                    value={formData.interest}
+                    onChange={(e) => setFormData({...formData, interest: e.target.value})}
+                    className="w-full px-4 py-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-secondary))] text-[hsl(var(--foreground))] focus:outline-none focus:border-[#FF6B35] transition-colors"
+                  >
+                    {interests.map((interest) => (
+                      <option key={interest.value} value={interest.value}>
+                        {interest.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">
+                    Message *
+                  </label>
+                  <textarea
+                    required
+                    rows={5}
+                    value={formData.message}
+                    onChange={(e) => setFormData({...formData, message: e.target.value})}
+                    className="w-full px-4 py-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-secondary))] text-[hsl(var(--foreground))] focus:outline-none focus:border-[#FF6B35] transition-colors resize-none"
+                    placeholder="Tell us about your project or inquiry..."
+                  />
+                </div>
+
+                {error && (
+                  <p className="text-red-500 text-sm">{error}</p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#FF6B35] text-white rounded-xl font-semibold hover:bg-[#FF6B35]/90 disabled:opacity-50 transition-all"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-5 h-5" />
+                      Send Message
+                    </>
+                  )}
+                </button>
+              </form>
+            </motion.div>
+
+            {/* Info Section */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="space-y-8"
+            >
+              {/* Global Offices */}
+              <div>
+                <h2 className="text-2xl font-bold text-[hsl(var(--foreground))] mb-6 flex items-center gap-2">
+                  <Globe className="w-6 h-6 text-[#FF6B35]" />
+                  Global Offices
+                </h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {offices.map((office) => (
+                    <div 
+                      key={office.city}
+                      className="p-4 bg-[hsl(var(--bg-secondary))] border border-[hsl(var(--border))] rounded-xl"
+                    >
+                      <div className="flex items-start gap-3">
+                        <MapPin className="w-5 h-5 text-[#FF6B35] flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-[hsl(var(--foreground))]">{office.city}</p>
+                          <p className="text-sm text-[hsl(var(--foreground-muted))]">{office.state}</p>
+                          <span className="inline-block mt-2 px-2 py-0.5 bg-[#FF6B35]/10 text-[#FF6B35] text-xs rounded-full">
+                            {office.type}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Business Hours Card */}
-              <div className="bg-[hsl(var(--surface-raised))] border border-[hsl(var(--border))] rounded-2xl p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <Clock className="w-5 h-5 text-[hsl(var(--foreground-muted))]" />
-                  <h3 className="text-lg font-semibold text-[hsl(var(--foreground))]">Business Hours</h3>
-                </div>
+              {/* Business Hours */}
+              <div className="p-6 bg-[hsl(var(--bg-secondary))] border border-[hsl(var(--border))] rounded-2xl">
+                <h3 className="font-semibold text-[hsl(var(--foreground))] mb-4 flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-[#FF6B35]" />
+                  Business Hours
+                </h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-[hsl(var(--foreground-muted))]">Monday - Friday</span>
-                    <span className="text-[hsl(var(--foreground))] font-medium">9:00 AM - 6:00 PM IST</span>
+                    <span className="text-[hsl(var(--foreground))]">9:00 AM - 6:00 PM IST</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[hsl(var(--foreground-muted))]">Saturday</span>
-                    <span className="text-[hsl(var(--foreground))] font-medium">10:00 AM - 2:00 PM IST</span>
+                    <span className="text-[hsl(var(--foreground))]">10:00 AM - 4:00 PM IST</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[hsl(var(--foreground-muted))]">Sunday</span>
-                    <span className="text-[hsl(var(--foreground))] font-medium">Closed</span>
+                    <span className="text-[hsl(var(--foreground))]">Closed</span>
                   </div>
                 </div>
               </div>
 
-              {/* Social Links Card */}
-              <div className="bg-[hsl(var(--surface-raised))] border border-[hsl(var(--border))] rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-[hsl(var(--foreground))] mb-4">Connect With Us</h3>
-                <div className="flex gap-3">
-                  <a href="https://www.linkedin.com/company/aizyantra" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-[hsl(var(--background))] border border-[hsl(var(--border))] rounded-xl flex items-center justify-center hover:bg-[hsl(var(--primary))] hover:border-[hsl(var(--primary))] hover:text-white text-[hsl(var(--foreground-muted))] transition-all">
-                    <Linkedin className="w-5 h-5" />
+              {/* Quick Contact */}
+              <div className="p-6 bg-gradient-to-r from-[#FF6B35]/10 to-blue-500/10 border border-[#FF6B35]/20 rounded-2xl">
+                <h3 className="font-semibold text-[hsl(var(--foreground))] mb-4">
+                  Need Immediate Assistance?
+                </h3>
+                <p className="text-sm text-[hsl(var(--foreground-muted))] mb-4">
+                  Talk to Tripti, our AI assistant, for instant answers to common questions.
+                </p>
+                <p className="text-sm text-[hsl(var(--foreground-muted))]">
+                  Or call us directly at{' '}
+                  <a href="tel:+919958824555" className="text-[#FF6B35] font-semibold hover:underline">
+                    +91-9958824555
                   </a>
-                  <a href="https://twitter.com/aizyantra" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-[hsl(var(--background))] border border-[hsl(var(--border))] rounded-xl flex items-center justify-center hover:bg-[hsl(var(--primary))] hover:border-[hsl(var(--primary))] hover:text-white text-[hsl(var(--foreground-muted))] transition-all">
-                    <Twitter className="w-5 h-5" />
-                  </a>
-                </div>
+                </p>
               </div>
-
-              {/* CTA Card */}
-              <div className="bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--accent))] rounded-2xl p-6 text-white">
-                <h3 className="text-lg font-semibold mb-2">Prefer a quick call?</h3>
-                <p className="text-white/80 text-sm mb-4">Book a free 30-minute discovery call to discuss your AI needs.</p>
-                <a href="https://calendly.com/sanjeev-aizyantra/discovery" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[hsl(var(--primary))] font-semibold rounded-lg hover:bg-white/90 transition-colors">
-                  Book a Call
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-              </div>
-
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
-
-      {/* FAQ Section */}
-      <section className="pb-24 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-[hsl(var(--surface-raised))] border border-[hsl(var(--border))] rounded-2xl p-8">
-            <h2 className="text-2xl font-semibold text-[hsl(var(--foreground))] mb-8 text-center">Frequently Asked Questions</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="p-4 bg-[hsl(var(--background))] rounded-xl">
-                <h4 className="font-semibold text-[hsl(var(--foreground))] mb-2">What is your typical response time?</h4>
-                <p className="text-sm text-[hsl(var(--foreground-muted))]">We respond to all inquiries within 2 hours during business hours. For urgent matters, call us directly.</p>
-              </div>
-              <div className="p-4 bg-[hsl(var(--background))] rounded-xl">
-                <h4 className="font-semibold text-[hsl(var(--foreground))] mb-2">Do you offer free consultations?</h4>
-                <p className="text-sm text-[hsl(var(--foreground-muted))]">Yes! We offer a free 30-minute discovery call to understand your needs and explain how we can help.</p>
-              </div>
-              <div className="p-4 bg-[hsl(var(--background))] rounded-xl">
-                <h4 className="font-semibold text-[hsl(var(--foreground))] mb-2">What industries do you work with?</h4>
-                <p className="text-sm text-[hsl(var(--foreground-muted))]">We specialize in healthcare and professional services, but our AI solutions work across all industries.</p>
-              </div>
-              <div className="p-4 bg-[hsl(var(--background))] rounded-xl">
-                <h4 className="font-semibold text-[hsl(var(--foreground))] mb-2">How long does a typical project take?</h4>
-                <p className="text-sm text-[hsl(var(--foreground-muted))]">Projects range from 2-12 weeks depending on complexity. We will provide a detailed timeline during our consultation.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
+    </div>
   )
 }
