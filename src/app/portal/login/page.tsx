@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Logo } from '@/components/ui/logo'
 import { 
   Mail, 
   Lock, 
@@ -103,8 +104,8 @@ export default function ClientLoginPage() {
           {/* Logo */}
           <div className="mb-8">
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">AI</span>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden">
+                <Logo width={48} height={48} />
               </div>
               <span className="text-xl font-bold text-white">
                 AIzYantra

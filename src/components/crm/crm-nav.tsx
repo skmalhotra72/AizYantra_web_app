@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Logo } from '@/components/ui/logo'
 import {
   LayoutDashboard,
   Users,
@@ -52,7 +53,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { name: 'Dashboard', href: '/crm', icon: LayoutDashboard },
-  { 
+  {
     name: 'Leads', 
     icon: Users,
     children: [
@@ -62,8 +63,8 @@ const navItems: NavItem[] = [
       { name: 'Voice Calls', href: '/crm/leads?source=voice_call', icon: MessageSquare },
     ]
   },
-  { 
-    name: 'Innovation', 
+  {
+    name: 'Innovation',
     icon: Lightbulb,
     children: [
       { name: 'Dashboard', href: '/crm/innovation', icon: LayoutDashboard },
@@ -93,9 +94,9 @@ export default function CRMNav() {
   useEffect(() => {
     const fetchUser = async () => {
       const supabase = createClient()
-      
+
       const { data: { user: authUser } } = await supabase.auth.getUser()
-      
+
       if (authUser) {
         // Fetch user profile
         const { data: profile } = await supabase
@@ -103,7 +104,7 @@ export default function CRMNav() {
           .select('*')
           .eq('id', authUser.id)
           .single()
-        
+
         if (profile) {
           setUser(profile)
         }
@@ -114,7 +115,7 @@ export default function CRMNav() {
         .select('name, role')
         .eq('user_id', authUser.id)
         .single()
-        
+
         if (member) {
           setTeamMember(member)
         }
@@ -134,7 +135,7 @@ export default function CRMNav() {
 
   const toggleMenu = (menuName: string) => {
     setExpandedMenus(prev => 
-      prev.includes(menuName) 
+      prev.includes(menuName)
         ? prev.filter(m => m !== menuName)
         : [...prev, menuName]
     )
@@ -149,8 +150,8 @@ export default function CRMNav() {
       // Extract base path without query params for comparison
       const basePath = item.href.split('?')[0]
       const currentBasePath = pathname.split('?')[0]
-      
-      return currentBasePath === basePath || 
+
+      return currentBasePath === basePath ||
         (basePath !== '/crm' && currentBasePath.startsWith(basePath))
     }
     if (item.children) {
@@ -196,8 +197,8 @@ export default function CRMNav() {
             onClick={() => toggleMenu(item.name)}
             className={`
               w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all
-              ${isActive 
-                ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30' 
+              ${isActive
+                ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30'
                 : 'text-slate-400 hover:bg-slate-800 hover:text-white'
               }
             `}
@@ -206,11 +207,11 @@ export default function CRMNav() {
               <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-teal-400' : ''}`} />
               <span className="text-sm font-medium">{item.name}</span>
             </div>
-            <ChevronDown 
+            <ChevronDown
               className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
             />
           </button>
-          
+
           {/* Children */}
           {isExpanded && (
             <div className="ml-4 mt-1 space-y-1 border-l border-slate-700 pl-2">
@@ -230,8 +231,8 @@ export default function CRMNav() {
           onClick={() => setIsMobileOpen(false)}
           className={`
             flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all
-            ${isActive 
-              ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30' 
+            ${isActive
+              ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30'
               : 'text-slate-400 hover:bg-slate-800 hover:text-white'
             }
             ${isCollapsed ? 'justify-center' : ''}
@@ -278,8 +279,8 @@ export default function CRMNav() {
         {/* Logo */}
         <div className={`p-4 border-b border-slate-800 ${isCollapsed ? 'px-2' : ''}`}>
           <Link href="/crm" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-blue-500 rounded-xl flex items-center justify-center shrink-0">
-              <span className="text-lg font-bold text-white">AI</span>
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+              <Logo width={48} height={48} />
             </div>
             {!isCollapsed && (
               <div>
@@ -294,7 +295,7 @@ export default function CRMNav() {
         {!isCollapsed && (
           <div className="p-4 border-b border-slate-800">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />       
               <input
                 type="text"
                 placeholder="Search..."
@@ -316,8 +317,8 @@ export default function CRMNav() {
               {/* Avatar */}
               <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center shrink-0">
                 {teamMember?.photo_url ? (
-                  <img 
-                    src={teamMember.photo_url} 
+                  <img
+                    src={teamMember.photo_url}
                     alt={user.full_name}
                     className="w-full h-full rounded-full object-cover"
                   />
@@ -327,7 +328,7 @@ export default function CRMNav() {
                   </span>
                 )}
               </div>
-              
+
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-white truncate">
@@ -338,7 +339,7 @@ export default function CRMNav() {
                   </p>
                 </div>
               )}
-              
+
               {!isCollapsed && (
                 <button
                   onClick={handleLogout}

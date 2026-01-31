@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Logo } from '@/components/ui/logo'
 import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 
@@ -55,13 +56,13 @@ export default function TeamLoginPage() {
           return
         }
 
-// Check if user is a team member (not a client)
-if (profile.role === 'client') {
-  setError('Access denied. This login is for team members only.')
-  await supabase.auth.signOut()
-  setIsLoading(false)
-  return
-}
+        // Check if user is a team member (not a client)
+        if (profile.role === 'client') {
+          setError('Access denied. This login is for team members only.')
+          await supabase.auth.signOut()
+          setIsLoading(false)
+          return
+        }
 
         // Redirect to CRM dashboard
         router.push('/crm')
@@ -86,8 +87,8 @@ if (profile.role === 'client') {
         <div className="relative z-10 text-center">
           {/* Logo */}
           <div className="mb-8">
-            <div className="w-20 h-20 bg-gradient-to-br from-teal-400 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl">
-              <span className="text-3xl font-bold text-white">AI</span>
+            <div className="w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl overflow-hidden">
+              <Logo width={96} height={96} />
             </div>
             <h1 className="text-4xl font-bold text-white mb-2">AIzYantra</h1>
             <p className="text-teal-400 text-lg">Intelligence by Design</p>
@@ -122,8 +123,8 @@ if (profile.role === 'client') {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-teal-400 to-blue-500 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl font-bold text-white">AI</span>
+            <div className="w-20 h-20 rounded-xl flex items-center justify-center mx-auto mb-3 overflow-hidden">
+              <Logo width={80} height={80} />
             </div>
             <h1 className="text-2xl font-bold text-white">AIzYantra</h1>
           </div>

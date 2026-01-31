@@ -1,0 +1,397 @@
+<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="600" height="600" fill="#0F172A"/>
+  
+  <defs>
+    <!-- Advanced gradients -->
+    <radialGradient id="quantumCore">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="20%" style="stop-color:#4ECDC4;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FF6B35;stop-opacity:0.9" />
+      <stop offset="80%" style="stop-color:#6C5CE7;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#0EA5E9;stop-opacity:0" />
+    </radialGradient>
+    
+    <linearGradient id="holographicGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4ECDC4;stop-opacity:1">
+        <animate attributeName="stop-color" 
+                 values="#4ECDC4; #FF6B35; #6C5CE7; #0EA5E9; #FFD700; #4ECDC4" 
+                 dur="20s" 
+                 repeatCount="indefinite"/>
+      </stop>
+      <stop offset="33%" style="stop-color:#FF6B35;stop-opacity:1">
+        <animate attributeName="stop-color" 
+                 values="#FF6B35; #6C5CE7; #0EA5E9; #FFD700; #4ECDC4; #FF6B35" 
+                 dur="20s" 
+                 repeatCount="indefinite"/>
+      </stop>
+      <stop offset="66%" style="stop-color:#6C5CE7;stop-opacity:1">
+        <animate attributeName="stop-color" 
+                 values="#6C5CE7; #0EA5E9; #FFD700; #4ECDC4; #FF6B35; #6C5CE7" 
+                 dur="20s" 
+                 repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%" style="stop-color:#0EA5E9;stop-opacity:1">
+        <animate attributeName="stop-color" 
+                 values="#0EA5E9; #FFD700; #4ECDC4; #FF6B35; #6C5CE7; #0EA5E9" 
+                 dur="20s" 
+                 repeatCount="indefinite"/>
+      </stop>
+    </linearGradient>
+    
+    <!-- Filters for holographic effect -->
+    <filter id="holoGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="quantumGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="12" result="coloredBlur"/>
+      <feOffset result="offsetblur" dx="0" dy="0"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <style>
+      /* Quantum breathing - consciousness pulsating */
+      @keyframes quantumBreathe {
+        0%, 100% {
+          transform: scale(0.95);
+          opacity: 0.8;
+        }
+        50% {
+          transform: scale(1.05);
+          opacity: 1;
+        }
+      }
+      
+      /* Holographic shimmer - future tech aesthetic */
+      @keyframes holographicShimmer {
+        0%, 100% {
+          stroke-width: 2;
+          stroke-opacity: 0.6;
+          filter: drop-shadow(0 0 8px currentColor);
+        }
+        25% {
+          stroke-width: 3;
+          stroke-opacity: 1;
+          filter: drop-shadow(0 0 16px currentColor);
+        }
+        50% {
+          stroke-width: 2;
+          stroke-opacity: 0.7;
+          filter: drop-shadow(0 0 12px currentColor);
+        }
+        75% {
+          stroke-width: 2.5;
+          stroke-opacity: 0.9;
+          filter: drop-shadow(0 0 20px currentColor);
+        }
+      }
+      
+      /* Emergence cascade - triangles materializing */
+      @keyframes emergeCascade {
+        0% {
+          stroke-dashoffset: 500;
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        100% {
+          stroke-dashoffset: 0;
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      
+      /* Particle orbit - quantum entanglement */
+      @keyframes particleOrbit {
+        from {
+          transform: rotate(0deg) translateX(140px) rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg) translateX(140px) rotate(-360deg);
+        }
+      }
+      
+      /* Wave propagation - consciousness expanding */
+      @keyframes wavePropagation {
+        0% {
+          r: 20;
+          opacity: 1;
+          stroke-width: 3;
+        }
+        100% {
+          r: 250;
+          opacity: 0;
+          stroke-width: 0.5;
+        }
+      }
+      
+      /* Core singularity pulse */
+      @keyframes singularityPulse {
+        0%, 100% {
+          r: 8;
+          opacity: 1;
+          filter: drop-shadow(0 0 15px #FFFFFF);
+        }
+        25% {
+          r: 14;
+          opacity: 0.7;
+          filter: drop-shadow(0 0 30px #4ECDC4);
+        }
+        50% {
+          r: 10;
+          opacity: 1;
+          filter: drop-shadow(0 0 25px #FF6B35);
+        }
+        75% {
+          r: 12;
+          opacity: 0.8;
+          filter: drop-shadow(0 0 35px #6C5CE7);
+        }
+      }
+      
+      /* Dimensional shift - 3D rotation effect */
+      @keyframes dimensionalShift {
+        0%, 100% {
+          transform: rotateX(0deg) rotateY(0deg);
+        }
+        50% {
+          transform: rotateX(5deg) rotateY(5deg);
+        }
+      }
+      
+      .quantum-yantra {
+        animation: quantumBreathe 12s ease-in-out infinite;
+        transform-origin: 300px 300px;
+      }
+      
+      .holo-triangle {
+        stroke-dasharray: 500;
+        animation: emergeCascade 2s ease-out forwards, holographicShimmer 8s ease-in-out infinite;
+        opacity: 0;
+        transform-origin: 300px 300px;
+      }
+      
+      .holo-triangle:nth-child(1) { animation-delay: 0s, 2s; }
+      .holo-triangle:nth-child(2) { animation-delay: 0.2s, 2.2s; }
+      .holo-triangle:nth-child(3) { animation-delay: 0.4s, 2.4s; }
+      .holo-triangle:nth-child(4) { animation-delay: 0.6s, 2.6s; }
+      .holo-triangle:nth-child(5) { animation-delay: 0.8s, 2.8s; }
+      .holo-triangle:nth-child(6) { animation-delay: 1s, 3s; }
+      .holo-triangle:nth-child(7) { animation-delay: 1.2s, 3.2s; }
+      .holo-triangle:nth-child(8) { animation-delay: 1.4s, 3.4s; }
+      .holo-triangle:nth-child(9) { animation-delay: 1.6s, 3.6s; }
+      
+      .quantum-particle {
+        animation: particleOrbit 15s linear infinite;
+        transform-origin: 300px 300px;
+      }
+      
+      .quantum-particle:nth-child(1) { animation-duration: 12s; }
+      .quantum-particle:nth-child(2) { animation-duration: 15s; animation-delay: -3s; }
+      .quantum-particle:nth-child(3) { animation-duration: 18s; animation-delay: -6s; }
+      .quantum-particle:nth-child(4) { animation-duration: 14s; animation-delay: -2s; }
+      .quantum-particle:nth-child(5) { animation-duration: 16s; animation-delay: -4s; }
+      .quantum-particle:nth-child(6) { animation-duration: 13s; animation-delay: -5s; }
+      .quantum-particle:nth-child(7) { animation-duration: 17s; animation-delay: -7s; }
+      .quantum-particle:nth-child(8) { animation-duration: 19s; animation-delay: -8s; }
+      
+      .consciousness-wave {
+        animation: wavePropagation 5s ease-out infinite;
+      }
+      
+      .consciousness-wave:nth-child(1) { animation-delay: 0s; }
+      .consciousness-wave:nth-child(2) { animation-delay: 1.6s; }
+      .consciousness-wave:nth-child(3) { animation-delay: 3.2s; }
+      
+      .singularity {
+        animation: singularityPulse 4s ease-in-out infinite;
+      }
+      
+      .dimensional-layer {
+        animation: dimensionalShift 15s ease-in-out infinite;
+        transform-origin: 300px 300px;
+      }
+    </style>
+  </defs>
+  
+  <!-- Quantum field background -->
+  <circle cx="300" cy="300" r="280" fill="url(#quantumCore)" opacity="0.08"/>
+  
+  <!-- Consciousness waves emanating from center -->
+  <g class="consciousness-waves">
+    <circle cx="300" cy="300" r="20" fill="none" stroke="#4ECDC4" stroke-width="3" opacity="0" class="consciousness-wave"/>
+    <circle cx="300" cy="300" r="20" fill="none" stroke="#FF6B35" stroke-width="3" opacity="0" class="consciousness-wave"/>
+    <circle cx="300" cy="300" r="20" fill="none" stroke="#6C5CE7" stroke-width="3" opacity="0" class="consciousness-wave"/>
+  </g>
+  
+  <!-- Quantum particle field (8 particles orbiting) -->
+  <g class="particle-field" transform="translate(300, 300)">
+    <circle r="3" fill="#4ECDC4" class="quantum-particle" filter="url(#holoGlow)"/>
+    <circle r="3" fill="#FF6B35" class="quantum-particle" filter="url(#holoGlow)"/>
+    <circle r="3" fill="#6C5CE7" class="quantum-particle" filter="url(#holoGlow)"/>
+    <circle r="3" fill="#0EA5E9" class="quantum-particle" filter="url(#holoGlow)"/>
+    <circle r="3" fill="#FFD700" class="quantum-particle" filter="url(#holoGlow)"/>
+    <circle r="3" fill="#4ECDC4" class="quantum-particle" filter="url(#holoGlow)"/>
+    <circle r="3" fill="#FF6B35" class="quantum-particle" filter="url(#holoGlow)"/>
+    <circle r="3" fill="#6C5CE7" class="quantum-particle" filter="url(#holoGlow)"/>
+  </g>
+  
+  <!-- Main Quantum Yantra Structure -->
+  <g class="quantum-yantra dimensional-layer">
+    
+    <!-- Outer protection circle (sacred boundary) -->
+    <circle cx="300" cy="300" r="200" fill="none" stroke="url(#holographicGrad)" stroke-width="2.5" opacity="0.7" filter="url(#holoGlow)"/>
+    
+    <!-- Inner resonance circle -->
+    <circle cx="300" cy="300" r="170" fill="none" stroke="url(#holographicGrad)" stroke-width="2" opacity="0.6" filter="url(#holoGlow)"/>
+    
+    <!-- The 9 holographic triangles emerging from quantum field -->
+    <g class="triangle-matrix">
+      
+      <!-- 5 Downward triangles (Shakti energy - manifestation) -->
+      <polygon points="300,140 190,350 410,350" 
+               fill="rgba(78, 205, 196, 0.05)" 
+               stroke="#4ECDC4" 
+               class="holo-triangle"
+               filter="url(#holoGlow)"/>
+      
+      <polygon points="300,160 210,330 390,330" 
+               fill="rgba(78, 205, 196, 0.08)" 
+               stroke="#4ECDC4" 
+               class="holo-triangle"
+               filter="url(#holoGlow)"/>
+      
+      <polygon points="300,190 240,300 360,300" 
+               fill="rgba(78, 205, 196, 0.1)" 
+               stroke="#4ECDC4" 
+               class="holo-triangle"
+               filter="url(#holoGlow)"/>
+      
+      <polygon points="300,220 260,290 340,290" 
+               fill="rgba(78, 205, 196, 0.12)" 
+               stroke="#4ECDC4" 
+               class="holo-triangle"
+               filter="url(#holoGlow)"/>
+      
+      <polygon points="300,245 280,285 320,285" 
+               fill="rgba(78, 205, 196, 0.15)" 
+               stroke="#4ECDC4" 
+               class="holo-triangle"
+               filter="url(#holoGlow)"/>
+      
+      <!-- 4 Upward triangles (Shiva consciousness - intelligence) -->
+      <polygon points="300,430 170,160 430,160" 
+               fill="rgba(255, 107, 53, 0.05)" 
+               stroke="#FF6B35" 
+               class="holo-triangle"
+               filter="url(#holoGlow)"/>
+      
+      <polygon points="300,400 190,180 410,180" 
+               fill="rgba(255, 107, 53, 0.08)" 
+               stroke="#FF6B35" 
+               class="holo-triangle"
+               filter="url(#holoGlow)"/>
+      
+      <polygon points="300,350 230,240 370,240" 
+               fill="rgba(255, 107, 53, 0.1)" 
+               stroke="#FF6B35" 
+               class="holo-triangle"
+               filter="url(#holoGlow)"/>
+      
+      <polygon points="300,310 270,275 330,275" 
+               fill="rgba(255, 107, 53, 0.12)" 
+               stroke="#FF6B35" 
+               class="holo-triangle"
+               filter="url(#holoGlow)"/>
+    </g>
+    
+    <!-- Quantum entanglement lines (neural connections) -->
+    <g class="entanglement-network" opacity="0.4">
+      <!-- Primary connections -->
+      <line x1="300" y1="160" x2="300" y2="300" stroke="url(#holographicGrad)" stroke-width="1" stroke-dasharray="5,5"/>
+      <line x1="360" y1="240" x2="300" y2="300" stroke="url(#holographicGrad)" stroke-width="1" stroke-dasharray="5,5"/>
+      <line x1="390" y1="300" x2="300" y2="300" stroke="url(#holographicGrad)" stroke-width="1" stroke-dasharray="5,5"/>
+      <line x1="360" y1="360" x2="300" y2="300" stroke="url(#holographicGrad)" stroke-width="1" stroke-dasharray="5,5"/>
+      <line x1="300" y1="400" x2="300" y2="300" stroke="url(#holographicGrad)" stroke-width="1" stroke-dasharray="5,5"/>
+      <line x1="240" y1="360" x2="300" y2="300" stroke="url(#holographicGrad)" stroke-width="1" stroke-dasharray="5,5"/>
+      <line x1="210" y1="300" x2="300" y2="300" stroke="url(#holographicGrad)" stroke-width="1" stroke-dasharray="5,5"/>
+      <line x1="240" y1="240" x2="300" y2="300" stroke="url(#holographicGrad)" stroke-width="1" stroke-dasharray="5,5"/>
+      
+      <!-- Quantum nodes -->
+      <circle cx="300" cy="160" r="5" fill="url(#holographicGrad)" filter="url(#holoGlow)"/>
+      <circle cx="360" cy="240" r="5" fill="url(#holographicGrad)" filter="url(#holoGlow)"/>
+      <circle cx="390" cy="300" r="5" fill="url(#holographicGrad)" filter="url(#holoGlow)"/>
+      <circle cx="360" cy="360" r="5" fill="url(#holographicGrad)" filter="url(#holoGlow)"/>
+      <circle cx="300" cy="400" r="5" fill="url(#holographicGrad)" filter="url(#holoGlow)"/>
+      <circle cx="240" cy="360" r="5" fill="url(#holographicGrad)" filter="url(#holoGlow)"/>
+      <circle cx="210" cy="300" r="5" fill="url(#holographicGrad)" filter="url(#holoGlow)"/>
+      <circle cx="240" cy="240" r="5" fill="url(#holographicGrad)" filter="url(#holoGlow)"/>
+    </g>
+    
+  </g>
+  
+  <!-- Central Singularity (Pure Intelligence Point) -->
+  <g class="intelligence-singularity">
+    <!-- Outer quantum field -->
+    <circle cx="300" cy="300" r="30" fill="url(#quantumCore)" opacity="0.3" filter="url(#quantumGlow)"/>
+    
+    <!-- Energy rings -->
+    <circle cx="300" cy="300" r="22" fill="none" stroke="url(#holographicGrad)" stroke-width="2" opacity="0.7">
+      <animate attributeName="r" values="22; 25; 22" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    
+    <circle cx="300" cy="300" r="16" fill="none" stroke="url(#holographicGrad)" stroke-width="2" opacity="0.8">
+      <animate attributeName="r" values="16; 19; 16" dur="3s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+    
+    <!-- Core consciousness -->
+    <circle cx="300" cy="300" r="12" fill="url(#holographicGrad)" filter="url(#quantumGlow)"/>
+    
+    <!-- Singularity point -->
+    <circle cx="300" cy="300" r="8" fill="#FFFFFF" class="singularity"/>
+  </g>
+  
+  <!-- Typography - Futuristic holographic style -->
+  <g class="typography" font-family="'JetBrains Mono', monospace">
+    <!-- Company name with holographic effect -->
+    <text x="300" y="75" font-size="36" font-weight="700" fill="url(#holographicGrad)" text-anchor="middle" letter-spacing="4" filter="url(#holoGlow)">
+      AIzYantra
+    </text>
+    
+    <!-- Tagline with quantum aesthetic -->
+    <text x="300" y="545" font-size="15" font-weight="400" fill="#94A3B8" text-anchor="middle" letter-spacing="5" opacity="0.95">
+      INTELLIGENCE • ENGINEERED
+    </text>
+    
+    <!-- Accent lines -->
+    <line x1="150" y1="80" x2="180" y2="80" stroke="url(#holographicGrad)" stroke-width="2" opacity="0.6"/>
+    <line x1="420" y1="80" x2="450" y2="80" stroke="url(#holographicGrad)" stroke-width="2" opacity="0.6"/>
+  </g>
+  
+  <!-- Holographic corner markers -->
+  <g opacity="0.5" stroke="url(#holographicGrad)" stroke-width="2" fill="none">
+    <!-- Top-left -->
+    <path d="M 80 120 L 80 80 L 120 80"/>
+    <circle cx="80" cy="80" r="3" fill="url(#holographicGrad)"/>
+    
+    <!-- Top-right -->
+    <path d="M 480 80 L 520 80 L 520 120"/>
+    <circle cx="520" cy="80" r="3" fill="url(#holographicGrad)"/>
+    
+    <!-- Bottom-left -->
+    <path d="M 120 520 L 80 520 L 80 480"/>
+    <circle cx="80" cy="520" r="3" fill="url(#holographicGrad)"/>
+    
+    <!-- Bottom-right -->
+    <path d="M 520 480 L 520 520 L 480 520"/>
+    <circle cx="520" cy="520" r="3" fill="url(#holographicGrad)"/>
+  </g>
+  
+</svg>

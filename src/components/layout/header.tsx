@@ -1,12 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { Menu, ArrowUpRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { Logo } from '@/components/ui/logo'
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -40,14 +40,12 @@ export function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-3 group">
           <div className={`relative overflow-hidden rounded-xl border border-[hsl(var(--border))] group-hover:border-[hsl(var(--accent-primary))] transition-all duration-300 ${
-            scrolled ? 'h-10 w-10' : 'h-12 w-12'
+            scrolled ? 'h-16 w-16' : 'h-20 w-20'
           }`}>
-            <Image
-              src="/images/logo.jpeg"
-              alt="AIzYantra Logo"
-              fill
+            <Logo
+              width={scrolled ? 64 : 80}
+              height={scrolled ? 64 : 80}
               className="object-cover"
-              priority
             />
           </div>
           <div className="flex flex-col">
@@ -111,11 +109,10 @@ export function Header() {
             >
               {/* Mobile Logo */}
               <div className="flex items-center space-x-3 mb-8 mt-4 pb-6 border-b border-[hsl(var(--border))]">
-                <div className="relative h-12 w-12 overflow-hidden rounded-xl border border-[hsl(var(--border))]">
-                  <Image
-                    src="/images/logo.jpeg"
-                    alt="AIzYantra Logo"
-                    fill
+                <div className="relative h-20 w-20 overflow-hidden rounded-xl border border-[hsl(var(--border))]">
+                  <Logo
+                    width={80}
+                    height={80}
                     className="object-cover"
                   />
                 </div>

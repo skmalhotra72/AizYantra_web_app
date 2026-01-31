@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Logo } from '@/components/ui/logo'
 import { 
   Mail, 
   Lock, 
@@ -163,7 +164,6 @@ function SignupContent() {
       const profileData = await response.json()
       console.log('Profile creation response:', profileData)
 
-      // ✅ FIXED: Check profileData instead of response
       if (profileData.error || !profileData.success) {
         console.error('Profile creation error:', profileData)
         setError(
@@ -227,8 +227,8 @@ function SignupContent() {
           {/* Logo */}
           <div className="mb-8">
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">AI</span>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden">
+                <Logo width={48} height={48} />
               </div>
               <span className="text-xl font-bold text-white">
                 AIzYantra
@@ -550,7 +550,7 @@ function SignupContent() {
   )
 }
 
-// Wrapper with Suspense - THIS IS THE ONLY CHANGE!
+// Wrapper with Suspense
 export default function PortalSignupPage() {
   return (
     <Suspense fallback={
